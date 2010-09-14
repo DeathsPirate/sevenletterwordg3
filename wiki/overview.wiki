@@ -18,8 +18,3 @@ lp
 = Outstanding Questions =
 
 If we draw a letter in between two letters we already have, that adds 26 possible child strings
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
