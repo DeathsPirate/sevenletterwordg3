@@ -32,7 +32,7 @@ class TestTrie {
 			while ((line = reader.readLine()) != null) {
 
 				line = line.toLowerCase();
-				t.insert(line);
+				t.insert(line, line);
 			}
 
 			System.out.println("Dictionary loaded!");
@@ -43,9 +43,11 @@ class TestTrie {
 				System.out.println("Please enter a word");
 				String find = scan.next();
 
-				System.out.println("Possible completions: ");
-				t.autoComplete(find);
-
+				//System.out.println(t.findWord(find));
+				TrieNode<String> node = t.returnAutoNode(find);
+				System.out.println(node.isWord());
+				System.out.println(node.returnWord());
+				
 				System.out.println("go again? (1) for yes");
 				int go = scan.nextInt();
 

@@ -1,6 +1,6 @@
 package seven.f10.g3;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.io.*;
 
 import seven.ui.Letter;
@@ -10,87 +10,73 @@ import seven.ui.SecretState;
 
 public class OurPlayer implements Player {
 
-	/*When our player loads*/
+	/* When our player loads */
 	public void Register() {
-		System.out.println("loading player");
-		BufferedReader r;
-		String line = null;
-		ArrayList<Word> wtmp = new ArrayList<Word>(55000);
+		String filename = "src/seven/f10/g3/alpha-smallwordlist.txt";
+		String line = "";
+		t = new TrieTree<String>();
+		
+		System.out.println("Loading Dictonary. Standby...");
+
 		try {
-			r = new BufferedReader(new FileReader(
-					"src/seven/g1/super-small-wordlist.txt"));
-			while (null != (line = r.readLine())) {
-				wtmp.add(new Word(line.trim()));
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			//Read each line and then add word to trie
+			while ((line = reader.readLine()) != null) {
+
+				line = line.toLowerCase();
+				t.insert(line, line);
 			}
+
+			System.out.println("Dictionary loaded!");
+			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		wordlist = wtmp.toArray(new Word[wtmp.size()]);
 	}
-	
-	/*Player Bids*/
+
+	/* Player Bids */
 	public int Bid(Letter bidLetter, ArrayList<PlayerBids> PlayerBidList,
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretstate, int PlayerID) {
-		/*if (PlayerBidList.isEmpty()) {
-			cachedBids = PlayerBidList;
-		}
-
-		if (null == currentLetters) {
-			currentLetters = new ArrayList<Character>(7);
-			ourID = PlayerID;
-			for (Letter l : secretstate.getSecretLetters()) {
-				currentLetters.add(l.getAlphabet());
-			}
-		} else {
-			if (cachedBids.size() > 0) {
-				checkBid(cachedBids.get(cachedBids.size() - 1));
-			}
-		}
-
-		return 0;*/
-		
-		return 1;
+		Random generator = new Random();
+		int r = generator.nextInt(20);
+		return (r);
 	}
 
-	/*Check to see if we win the bid*/
+	/* Check to see if we win the bid */
 	private void checkBid(PlayerBids b) {
 		if (ourID == b.getWinnerID()) {
 			currentLetters.add(b.getTargetLetter().getAlphabet());
 		}
 	}
 
-	/*Return our final word back to the simulator*/
+	/* Return our final word back to the simulator */
 	public String returnWord() {
-		/*checkBid(cachedBids.get(cachedBids.size() - 1));
-		char c[] = new char[7];
-		for (int i = 0; i < currentLetters.size(); i++) {
-			c[i] = currentLetters.get(i);
-		}
-		String s = new String(c);
-		Word ourletters = new Word(s);
-		Word bestword = new Word("");
-		for (Word w : wordlist) {
-			if (ourletters.contains(w)) {
-				if (w.score > bestword.score) {
-					bestword = w;
-				}
-
+		
+		char[] rack = new char[currentLetters.size()];
+		for(int i = 0; i < currentLetters.size(); i++)
+			rack[i] = currentLetters.get(i);
+		Arrays.sort(rack);
+		Boolean haveWord = false;
+		
+		//Look in trie for words
+		while(haveWord == false){
+			for(int i = rack.length; i > 0; i--){//find combinations for all letters
+				
+				
+				
 			}
+			
 		}
-		currentLetters = null;
-		System.out.println("about to return: " + bestword.word);*/
-		//return bestword.word;
-		return("hello");
+		
+		
+		return ("hello");
 	}
 
 	ArrayList<Character> currentLetters;
 	private int ourID;
-	private ArrayList<PlayerBids> cachedBids;
-	private Word[] wordlist;
+	private TrieTree<String> t;
 
 }
