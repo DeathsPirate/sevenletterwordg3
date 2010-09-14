@@ -1,0 +1,25 @@
+Overview of group 3's project
+
+
+= Overall Strategy =
+
+Big high or low based on the percentage change of getting a 7 letter word
+
+Organize dictionary in trie where each word is alphabetized to make searching easy
+
+= 9/13/2010 =
+
+Added in Trie Code
+Wrote script to alphabetize letters in words
+Copied Stingy player and set up with g3's player
+Set up initial project with svn
+lp
+
+= Outstanding Questions =
+
+If we draw a letter in between two letters we already have, that adds 26 possible child strings
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
