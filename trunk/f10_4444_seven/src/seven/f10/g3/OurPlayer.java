@@ -10,15 +10,15 @@ import seven.ui.SecretState;
 
 public class OurPlayer implements Player {
 
-
-	static final Word[] wordlist;
-
-	static {
+	/*When our player loads*/
+	public void Register() {
+		System.out.println("loading player");
 		BufferedReader r;
 		String line = null;
 		ArrayList<Word> wtmp = new ArrayList<Word>(55000);
 		try {
-			r = new BufferedReader(new FileReader("src/seven/g1/super-small-wordlist.txt"));
+			r = new BufferedReader(new FileReader(
+					"src/seven/g1/super-small-wordlist.txt"));
 			while (null != (line = r.readLine())) {
 				wtmp.add(new Word(line.trim()));
 			}
@@ -31,15 +31,12 @@ public class OurPlayer implements Player {
 		}
 		wordlist = wtmp.toArray(new Word[wtmp.size()]);
 	}
-
-	ArrayList<Character> currentLetters;
-	private int ourID;
-	private ArrayList<PlayerBids> cachedBids;
-
+	
+	/*Player Bids*/
 	public int Bid(Letter bidLetter, ArrayList<PlayerBids> PlayerBidList,
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretstate, int PlayerID) {
-		if (PlayerBidList.isEmpty()) {
+		/*if (PlayerBidList.isEmpty()) {
 			cachedBids = PlayerBidList;
 		}
 
@@ -55,23 +52,23 @@ public class OurPlayer implements Player {
 			}
 		}
 
-		return 0;
+		return 0;*/
+		
+		return 1;
 	}
 
+	/*Check to see if we win the bid*/
 	private void checkBid(PlayerBids b) {
 		if (ourID == b.getWinnerID()) {
 			currentLetters.add(b.getTargetLetter().getAlphabet());
 		}
 	}
 
-	public void Register() {
-		// no-op
-	}
-
+	/*Return our final word back to the simulator*/
 	public String returnWord() {
-		checkBid(cachedBids.get(cachedBids.size() - 1));
+		/*checkBid(cachedBids.get(cachedBids.size() - 1));
 		char c[] = new char[7];
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < currentLetters.size(); i++) {
 			c[i] = currentLetters.get(i);
 		}
 		String s = new String(c);
@@ -86,7 +83,14 @@ public class OurPlayer implements Player {
 			}
 		}
 		currentLetters = null;
-		return bestword.word;
+		System.out.println("about to return: " + bestword.word);*/
+		//return bestword.word;
+		return("hello");
 	}
+
+	ArrayList<Character> currentLetters;
+	private int ourID;
+	private ArrayList<PlayerBids> cachedBids;
+	private Word[] wordlist;
 
 }
