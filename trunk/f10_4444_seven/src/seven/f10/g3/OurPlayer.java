@@ -24,7 +24,8 @@ public class OurPlayer implements Player {
 			while ((line = reader.readLine()) != null) {
 
 				line = line.toLowerCase();
-				t.insert(line, line);
+				String[] l = line.split(", ");
+				t.insert(l[0], l[1]);
 			}
 
 			System.out.println("Dictionary loaded!");

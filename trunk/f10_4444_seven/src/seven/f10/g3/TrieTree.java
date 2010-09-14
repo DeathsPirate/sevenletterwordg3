@@ -83,7 +83,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 			if (find(word, h, c, root, temp) == true
 					&& returnNode(word, h, c, root, temp).isWord() == false) {
 
-				returnNode(word, h, c, root, temp).changeWord(word);
+				returnNode(word, h, c, root, temp).changeWord(realWord);
 			}
 
 			else
