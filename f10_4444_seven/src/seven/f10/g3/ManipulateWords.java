@@ -22,7 +22,7 @@ public class ManipulateWords {
 			BufferedWriter out = new BufferedWriter(f);
 			while ((strLine = br.readLine()) != null) {
 				// Print the content on the console
-				out.write(Sort(strLine) + "\n");
+				out.write(Sort(strLine) + ", " + strLine + "\n");
 			}
 
 			// Close the stream
