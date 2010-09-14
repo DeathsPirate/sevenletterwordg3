@@ -34,7 +34,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 	 */
 	public TrieTree() {
 
-		root = new TrieNode("root", 0, false);
+		root = new TrieNode("root", 0, false, "");
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 	 * @param x
 	 *            the item to insert.
 	 */
-	public void insert(String x) {
+	public void insert(String x, String realWord) {
 
 		String word = (String) x;
 		String temp = "";
@@ -65,7 +65,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 		int c = 0;
 
 		if (find(word, h, c, root, temp) == true
-				&& returnAutoNode(word).returnWord() == true)
+				&& returnAutoNode(word).isWord() == true)
 			;// If word has already been added, do nothing
 
 		else {
@@ -75,19 +75,19 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 				shortWord += word.charAt(i);
 				// If we don't find the shortWord as a root then we add it
 				if (find(shortWord, h, c, root, temp) == false)
-					insert(shortWord, temp, h, root, c, false);
+					insert(shortWord, temp, h, root, c, false, "");
 
 			}
 
 			// now insert whole word
 			if (find(word, h, c, root, temp) == true
-					&& returnNode(word, h, c, root, temp).returnWord() == false) {
+					&& returnNode(word, h, c, root, temp).isWord() == false) {
 
-				returnNode(word, h, c, root, temp).changeWord();
+				returnNode(word, h, c, root, temp).changeWord(word);
 			}
 
 			else
-				insert(word, temp, h, root, c, true);
+				insert(word, temp, h, root, c, true, realWord);
 		}
 
 	}
@@ -112,7 +112,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 	 * @return
 	 */
 	private TrieNode<AnyType> insert(String w, String temp, int h,
-			TrieNode<AnyType> n, int c, boolean whole) {
+			TrieNode<AnyType> n, int c, boolean whole, String realWord) {
 
 		h++;
 		temp += w.charAt(c);
@@ -123,12 +123,12 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 			String child = (String) n.children.get(i).element;
 			if (temp.compareTo(child) == 0 && w.length() > c + 1) {
 				c++;
-				return insert(w, temp, h, n.children.get(i), c, whole);
+				return insert(w, temp, h, n.children.get(i), c, whole, realWord);
 			}
 
 		}
 
-		return add(w, h, n, whole);
+		return add(w, h, n, whole, realWord);
 
 	}
 
@@ -142,9 +142,9 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 	 * @return
 	 */
 	public TrieNode<AnyType> add(String w, int h, TrieNode<AnyType> n,
-			boolean word) {
+			boolean word, String realWord) {
 
-		TrieNode<AnyType> tempNode = new TrieNode(w, h, word);
+		TrieNode<AnyType> tempNode = new TrieNode(w, h, word, realWord);
 		n.children.add(tempNode);
 		return tempNode;
 	}
@@ -183,7 +183,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 		temp += w.charAt(c);
 
 		for (int i = 0; i < n.children.size(); i++) {// scans through all
-														// children
+			// children
 
 			String child = (String) n.children.get(i).element;
 
@@ -240,7 +240,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 			}
 
 			else if (temp.compareTo(child) == 0
-					&& n.children.get(i).returnWord() == false) {
+					&& n.children.get(i).isWord() == false) {
 				return n.children.get(i);
 			}
 
@@ -279,9 +279,22 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 
 			}
 		}
-		
+
 		else
 			System.out.println("Sorry, your string was not found");
+	}
+
+	/** Determines if input is word */
+	public boolean findWord(String w) {
+
+		if (find(w) == true) {
+
+			System.out.println("found word");
+			TrieNode<AnyType> tempRoot = returnAutoNode(w);
+			return (tempRoot.isWord());
+		}
+		
+		return(false);
 	}
 
 	/**
@@ -295,16 +308,17 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 	}
 
 	/**
-	 * Internal method to print a subtree in sorted order based on a preorder traversal (parent then child).
+	 * Internal method to print a subtree in sorted order based on a preorder
+	 * traversal (parent then child).
 	 * 
 	 * @param t
 	 *            the node that roots the subtree.
 	 */
 	private void printChildren(TrieNode<AnyType> t) {
 		if (t != null) {
-			
+
 			// Print element
-			if (t.returnWord())
+			if (t.isWord())
 				System.out.println(t.element);
 
 			// Print children
@@ -359,11 +373,10 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 	}
 
 	private TrieNode<AnyType> root;
-	public static int width = 1000, height = 800;
 	Integer index = -1;
 	public static String shortWord;
 	public static int breakUpConstant = 10; // the max number of subtrees that
-											// we
+	// we
 	// will break every word into
 
 }

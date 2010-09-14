@@ -29,11 +29,15 @@ class TrieNode<AnyType> {
 	 * @param theElement
 	 * @param tempHeight
 	 */
-	TrieNode(AnyType theElement, int tempHeight, boolean w) {
+	TrieNode(AnyType theElement, int tempHeight, boolean w, String s) {
 		element = theElement;
 		height = tempHeight;
 		children = new ArrayList<TrieNode>();
 		word = w;
+		realWord = s;
+		
+		if(word == true)
+			System.out.println(realWord);
 	}
 
 	/**
@@ -64,8 +68,14 @@ class TrieNode<AnyType> {
 	 * 
 	 * @return word
 	 */
-	public boolean returnWord() {
+	public boolean isWord() {
 		return word;
+	}
+	
+	public String returnWord(){
+		
+		return (realWord);
+		
 	}
 
 	/**
@@ -76,13 +86,15 @@ class TrieNode<AnyType> {
 	 * "attic" would have a true word value. If we later add at we simply change
 	 * what was only a prefix node to instead be a word node.
 	 */
-	public void changeWord() {
+	public void changeWord(String r) {
 		word = true;
+		realWord = r;
 	}
 
 	AnyType element; // The data in the node
 	public ArrayList<TrieNode> children;
 	private int height = 0;
 	private boolean word;
+	private String realWord;
 
 }
