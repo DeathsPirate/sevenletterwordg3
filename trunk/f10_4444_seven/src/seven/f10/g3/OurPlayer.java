@@ -101,9 +101,10 @@ public class OurPlayer implements Player {
 		String temp = new String(rack);
 		l.trace("current rack: " + temp);
 		combinations("", temp);
+		combination_list = sort_by_length(combination_list);
 		if (rack.length > 0)
 			for (int i = 0; i < combination_list.size(); i++) {
-				// l.trace("looking for: " + combination_list.get(i));
+				l.trace("looking for: " + combination_list.get(i));
 				TrieNode<String> node = t.returnAutoNode(combination_list
 						.get(i));
 				if (node != null && node.isWord() == true) {
@@ -122,11 +123,29 @@ public class OurPlayer implements Player {
 			combinations(prefix, s.substring(1));
 		}
 	}
-	
-	/*private ArrayList<String> sort_by_length(ArrayList<String> old_list){
-		
-		ArrayList<String> temp = new ArrayList<String>();
-		
-	}*/
+
+	private ArrayList<String> sort_by_length(ArrayList<String> old_list) {
+
+		l.trace("here");
+		int i = 0;
+		int j = 0;
+		Boolean keepgoing = true;
+		while (keepgoing == true) {
+			keepgoing = false;
+			for (i = 0; i < old_list.size(); i++) {
+				for (j = 0; j < old_list.size(); j++) {
+					if (old_list.get(i).length() < old_list.get(j).length()) {
+						l.trace("before: " + old_list.get(i));
+						Collections.swap(old_list, i, j);
+						l.trace("after: " + old_list.get(i)+ "\n");						
+						keepgoing = true;
+					}
+				}
+			}
+			i = 0;
+		}
+		l.trace("returning");
+		return old_list;
+	}
 
 }
