@@ -63,6 +63,16 @@ public class OurPlayer implements Player {
 	public int Bid(Letter bidLetter, ArrayList<PlayerBids> PlayerBidList,
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretstate, int PlayerID) {
+		
+		/*if(currentLetters != null){
+		if(currentLetters.size() > 0)
+			l.trace("\n\nAt beginning of bid method our rack is: " + currentLetters.toString());
+		else
+			l.trace("\n\nAt beginning of bid method our rack is: 0");}
+		else{
+			l.trace("\n\nAt beginning of bid method our rack is: null");
+			}*/
+		
 		if (PlayerBidList.isEmpty()) {
 			cachedBids = PlayerBidList;
 		}
@@ -79,24 +89,20 @@ public class OurPlayer implements Player {
 			}
 		}
 
-		// Generate a random bid
-		/*
-		 * Random generator = new Random(); int r = generator.nextInt(5);
-		 */
-
 		// Generate Bids
 		int bid = 1;
 
-		ArrayList<Character> temp = currentLetters;
+		ArrayList<Character> temp = new ArrayList<Character>(currentLetters);
 		temp.add(bidLetter.getAlphabet());
 		char[] tempRack = new char[temp.size() + 1];
 		for (int i = 0; i < temp.size(); i++)
-			tempRack[i] = currentLetters.get(i);
+			tempRack[i] = temp.get(i);
 		Arrays.sort(tempRack);
 		TrieNode<String> node = t.returnAutoNode(new String(tempRack));
 		if (node != null && node.isWord() == true) {
 			bid = 5;
-		} else {
+		} 
+		/*else {
 			for (char c = 'a'; c <= 'z'; c++) {
 				tempRack[(tempRack.length - 1)] = c;
 				Arrays.sort(tempRack);
@@ -105,9 +111,9 @@ public class OurPlayer implements Player {
 					bid = 5;
 				}
 			}
-
-		}
+		}*/
 		
+		l.trace("Our rack is: " + currentLetters.toString() + ", the letter up was: " + bidLetter.getAlphabet() + ", and we bid: " + bid);
 		return (bid);
 	}
 
