@@ -83,8 +83,6 @@ public class GameEngine extends javax.swing.JFrame {
                 System.out.println("Game runner interrupted");
             }
         }
-
-
     }
 
 

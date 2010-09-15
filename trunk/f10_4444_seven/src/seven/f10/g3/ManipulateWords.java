@@ -10,7 +10,7 @@ public class ManipulateWords {
 		try {
 			// Open File
 			FileInputStream fstream = new FileInputStream(
-					"src/seven/f10/g3/smallwordlist.txt");
+					"src/seven/f10/g3/dictionary.txt");
 
 			// Get the object of DataInputStream
 			DataInputStream in = new DataInputStream(fstream);
