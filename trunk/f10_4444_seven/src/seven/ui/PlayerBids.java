@@ -53,7 +53,4 @@ public class PlayerBids {
 	public int getWinnerID() {
 		return winnerID;
 	}
-    
-
-
 }
