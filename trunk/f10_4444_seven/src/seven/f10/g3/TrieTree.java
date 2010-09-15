@@ -334,7 +334,7 @@ public class TrieTree<AnyType extends Comparable<? super AnyType>> {
 		int h = 0;
 		int c = 0;
 
-		return returnAutoNode(w, h, c, root, temp);
+		return returnAutoNode(w.toLowerCase(), h, c, root, temp);
 
 	}
 

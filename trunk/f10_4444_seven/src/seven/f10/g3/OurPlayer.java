@@ -98,11 +98,11 @@ public class OurPlayer implements Player {
 		for (int i = 0; i < temp.size(); i++)
 			tempRack[i] = temp.get(i);
 		Arrays.sort(tempRack);
-		TrieNode<String> node = t.returnAutoNode(new String(tempRack));
+		TrieNode<String> node = t.returnAutoNode(new String(tempRack).toLowerCase());
 		if (node != null && node.isWord() == true) {
 			bid = 5;
 		} 
-		/*else {
+		else {
 			for (char c = 'a'; c <= 'z'; c++) {
 				tempRack[(tempRack.length - 1)] = c;
 				Arrays.sort(tempRack);
@@ -111,7 +111,7 @@ public class OurPlayer implements Player {
 					bid = 5;
 				}
 			}
-		}*/
+		}
 		
 		l.trace("Our rack is: " + currentLetters.toString() + ", the letter up was: " + bidLetter.getAlphabet() + ", and we bid: " + bid);
 		return (bid);
@@ -141,9 +141,9 @@ public class OurPlayer implements Player {
 		if (rack.length > 0) {
 			String str = search(combination_list_long);
 			if (str.length() > 0)
-				return (str);
+				return (str.toUpperCase());
 			else
-				search(combination_list_short);
+				return(search(combination_list_short).toUpperCase());
 		}
 
 		return ("");
@@ -152,7 +152,7 @@ public class OurPlayer implements Player {
 	private String search(ArrayList<String> combination_list) {
 
 		for (int i = 0; i < combination_list.size(); i++) {
-			TrieNode<String> node = t.returnAutoNode(combination_list.get(i));
+			TrieNode<String> node = t.returnAutoNode(combination_list.get(i).toLowerCase());
 			if (node != null && node.isWord() == true) {
 				l.trace("letters used: " + combination_list.get(i));
 				l.trace("word returned: " + node.returnWord());

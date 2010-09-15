@@ -89,7 +89,7 @@ class TrieNode<AnyType> {
 	public void changeWord(String r) {
 		word = true;
 		realWord = r;
-		System.out.println("Updated: " + r);
+		System.out.println("Updated: " + r + ", element is: " + element);
 	}
 
 	AnyType element; // The data in the node
