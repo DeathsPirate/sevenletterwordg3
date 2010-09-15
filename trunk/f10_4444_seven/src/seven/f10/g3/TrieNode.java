@@ -37,7 +37,7 @@ class TrieNode<AnyType> {
 		realWord = s;
 		
 		if(word == true)
-			System.out.println(realWord);
+			System.out.println("real word is: " + realWord);
 	}
 
 	/**
@@ -89,6 +89,7 @@ class TrieNode<AnyType> {
 	public void changeWord(String r) {
 		word = true;
 		realWord = r;
+		System.out.println("Updated: " + r);
 	}
 
 	AnyType element; // The data in the node
