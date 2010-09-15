@@ -2,6 +2,9 @@ package seven.f10.g3;
 
 import java.util.*;
 import java.io.*;
+
+import javax.xml.stream.events.Characters;
+
 import org.apache.log4j.Logger;
 import seven.ui.Letter;
 import seven.ui.Player;
@@ -13,7 +16,8 @@ public class OurPlayer implements Player {
 	private ArrayList<PlayerBids> cachedBids;
 	private int ourID;
 	private TrieTree<String> t;
-	private ArrayList<String> combination_list;
+	private ArrayList<String> combination_list_short;
+	private ArrayList<String> combination_list_long;
 	protected Logger l;;
 	private char[][] alphabet;
 
@@ -26,7 +30,8 @@ public class OurPlayer implements Player {
 		String filename = "src/seven/f10/g3/alpha-smallwordlist.txt";
 		String line = "";
 		t = new TrieTree<String>();
-		combination_list = new ArrayList<String>();
+		combination_list_short = new ArrayList<String>();
+		combination_list_long = new ArrayList<String>();
 		l = Logger.getLogger(this.getClass());
 		alphabet = new char[26][2];
 
@@ -75,9 +80,35 @@ public class OurPlayer implements Player {
 		}
 
 		// Generate a random bid
-		Random generator = new Random();
-		int r = generator.nextInt(5);
-		return (r);
+		/*
+		 * Random generator = new Random(); int r = generator.nextInt(5);
+		 */
+
+		// Generate Bids
+		int bid = 1;
+
+		ArrayList<Character> temp = currentLetters;
+		temp.add(bidLetter.getAlphabet());
+		char[] tempRack = new char[temp.size() + 1];
+		for (int i = 0; i < temp.size(); i++)
+			tempRack[i] = currentLetters.get(i);
+		Arrays.sort(tempRack);
+		TrieNode<String> node = t.returnAutoNode(new String(tempRack));
+		if (node != null && node.isWord() == true) {
+			bid = 5;
+		} else {
+			for (char c = 'a'; c <= 'z'; c++) {
+				tempRack[(tempRack.length - 1)] = c;
+				Arrays.sort(tempRack);
+				node = t.returnAutoNode(new String(tempRack));
+				if (node != null && node.isWord() == true) {
+					bid = 5;
+				}
+			}
+
+		}
+		
+		return (bid);
 	}
 
 	/** Check to see if we win the bid */
@@ -101,51 +132,52 @@ public class OurPlayer implements Player {
 		String temp = new String(rack);
 		l.trace("current rack: " + temp);
 		combinations("", temp);
-		combination_list = sort_by_length(combination_list);
-		if (rack.length > 0)
-			for (int i = 0; i < combination_list.size(); i++) {
-				l.trace("looking for: " + combination_list.get(i));
-				TrieNode<String> node = t.returnAutoNode(combination_list
-						.get(i));
-				if (node != null && node.isWord() == true) {
-					l.trace("letters used: " + combination_list.get(i));
-					l.trace("word returned: " + node.returnWord());
-					return (node.returnWord());
-				}
+		if (rack.length > 0) {
+			String str = search(combination_list_long);
+			if (str.length() > 0)
+				return (str);
+			else
+				search(combination_list_short);
+		}
+
+		return ("");
+	}
+
+	private String search(ArrayList<String> combination_list) {
+
+		for (int i = 0; i < combination_list.size(); i++) {
+			TrieNode<String> node = t.returnAutoNode(combination_list.get(i));
+			if (node != null && node.isWord() == true) {
+				l.trace("letters used: " + combination_list.get(i));
+				l.trace("word returned: " + node.returnWord());
+				return (node.returnWord());
 			}
+		}
 		return ("");
 	}
 
 	private void combinations(String prefix, String s) {
 		if (s.length() > 0) {
-			combination_list.add(prefix + s.charAt(0));
+			String str = prefix + s.charAt(0);
+			if (str.length() > 3)
+				combination_list_long.add(str);
+			else
+				combination_list_short.add(str);
 			combinations(prefix + s.charAt(0), s.substring(1));
 			combinations(prefix, s.substring(1));
 		}
 	}
 
-	private ArrayList<String> sort_by_length(ArrayList<String> old_list) {
-
-		l.trace("here");
-		int i = 0;
-		int j = 0;
-		Boolean keepgoing = true;
-		while (keepgoing == true) {
-			keepgoing = false;
-			for (i = 0; i < old_list.size(); i++) {
-				for (j = 0; j < old_list.size(); j++) {
-					if (old_list.get(i).length() < old_list.get(j).length()) {
-						l.trace("before: " + old_list.get(i));
-						Collections.swap(old_list, i, j);
-						l.trace("after: " + old_list.get(i)+ "\n");						
-						keepgoing = true;
-					}
-				}
-			}
-			i = 0;
-		}
-		l.trace("returning");
-		return old_list;
-	}
+	/*
+	 * private ArrayList<String> sort_by_length(ArrayList<String> old_list) {
+	 * 
+	 * l.trace("here"); int i = 0; int j = 0; Boolean keepgoing = true; while
+	 * (keepgoing == true) { keepgoing = false; for (i = 0; i < old_list.size();
+	 * i++) { for (j = 0; j < old_list.size(); j++) { if
+	 * (old_list.get(i).length() < old_list.get(j).length()) {
+	 * l.trace("before: " + old_list.get(i)); Collections.swap(old_list, i, j);
+	 * l.trace("after: " + old_list.get(i)+ "\n"); keepgoing = true; } } } i =
+	 * 0; } l.trace("returning"); return old_list; }
+	 */
 
 }
