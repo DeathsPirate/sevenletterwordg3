@@ -10,11 +10,13 @@ import seven.ui.SecretState;
 
 public class OurPlayer implements Player
 {
-	ArrayList<Character> currentLetters=new ArrayList<Character>();
+	private ArrayList<Character> currentLetters;
+	private ArrayList<PlayerBids> cachedBids;
 	private int ourID;
 	private TrieTree<String> t;
-	
-	public OurPlayer()
+
+	/* When our player loads */
+	public void Register()
 	{
 		String filename="src/seven/f10/g3/alpha-smallwordlist.txt";
 		String line="";
@@ -30,7 +32,7 @@ public class OurPlayer implements Player
 			{
 
 				line=line.toLowerCase();
-				String[] l = line.split(", ");
+				String[] l=line.split(", ");
 				t.insert(l[0], l[1]);
 			}
 
@@ -44,18 +46,34 @@ public class OurPlayer implements Player
 			e.printStackTrace();
 		}
 	}
-	
-	/* When our player loads */
-	public void Register()
-	{
-		
-	}
 
 	/* Player Bids */
 	public int Bid(Letter bidLetter, ArrayList<PlayerBids> PlayerBidList,
 		int total_rounds, ArrayList<String> PlayerList,
 		SecretState secretstate, int PlayerID)
 	{
+		if (PlayerBidList.isEmpty())
+		{
+			cachedBids=PlayerBidList;
+		}
+
+		if (null==currentLetters)
+		{
+			currentLetters=new ArrayList<Character>();
+			ourID=PlayerID;
+			for (Letter l : secretstate.getSecretLetters())
+			{
+				currentLetters.add(l.getAlphabet());
+			}
+		}
+		else
+		{
+			if (cachedBids.size()>0)
+			{
+				checkBid(cachedBids.get(cachedBids.size()-1));
+			}
+		}
+
 		Random generator=new Random();
 		int r=generator.nextInt(20);
 		return (r);
@@ -73,9 +91,10 @@ public class OurPlayer implements Player
 	/* Return our final word back to the simulator */
 	public String returnWord()
 	{
-		System.out.println("currentLetters.size(): "+currentLetters.size()+"\n");
+		System.out
+			.println("currentLetters.size(): "+currentLetters.size()+"\n");
 		char[] rack=new char[currentLetters.size()];
-		
+
 		for (int i=0; i<currentLetters.size(); i++)
 			rack[i]=currentLetters.get(i);
 		Arrays.sort(rack);
