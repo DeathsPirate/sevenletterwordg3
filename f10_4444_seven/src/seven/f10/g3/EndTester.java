@@ -39,13 +39,12 @@ public class EndTester {
 				e.printStackTrace();
 			}
 
-			//char[] rack = { 'E', 'I', 'I', 'L','L', 'M', 'R', 'R'};
-			char[] rack = { 'I', 'L','L', 'M', 'R', 'R'};
+			char[] rack = { 'A', 'P', 'W'};
 			Arrays.sort(rack);
 
 			// Look in trie for words
 			String temp = new String(rack);
-			System.out.println("\n\n\n\n\ncurrent rack: " + temp);
+			System.out.println("\n\ncurrent rack: " + temp);
 			combinations("", temp);
 			if (rack.length > 0) {
 				str = search(combination_list_long);
@@ -72,12 +71,16 @@ public class EndTester {
 	private static String search(ArrayList<String> combination_list) {
 
 		for (int i = 0; i < combination_list.size(); i++) {
-			TrieNode<String> node = t.returnAutoNode(combination_list.get(i));
+			System.out.println("looking for word that is: " + combination_list.get(i));
+			TrieNode<String> node = t.returnAutoNode(combination_list.get(i).toLowerCase());
+			System.out.println("node is: " + node);
 			if (node != null && node.isWord() == true) {
 				System.out.println("letters used: " + combination_list.get(i));
 				System.out.println("word returned: " + node.returnWord());
 				return (node.returnWord());
 			}
+			
+			
 		}
 		return ("");
 	}
