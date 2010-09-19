@@ -80,7 +80,6 @@ public class Rack {
 	public void resetWants(String highWord) {
 
 		for (int i = 0; i < r.size(); i++) {
-			System.out.println(r.get(i).getL());
 			r.get(i).setWant(false);
 		}
 
