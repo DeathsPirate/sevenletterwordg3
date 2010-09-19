@@ -18,7 +18,7 @@ class TestTrie {
 	public static void main(String[] args) throws IOException {
 
 		//filename = args[0];
-		filename = "src/seven/f10/g3/alpha-smallwordlist.txt";
+		filename = "src/seven/f10/g3/alpha-smallwordlist7-allcombos.txt";
 		
 		TrieTree<String> t = new TrieTree<String>();
 		Scanner scan = new Scanner(System.in);
@@ -45,9 +45,10 @@ class TestTrie {
 				String find = scan.next();
 
 				//System.out.println(t.findWord(find));
-				TrieNode<String> node = t.returnAutoNode(find);
-				System.out.println(node.isWord());
-				System.out.println(node.returnWord());
+				//TrieNode<String> node = t.returnAutoNode(find);
+				//System.out.println(node.isWord());
+				//System.out.println(node.returnWord());
+				t.autoComplete(find);
 				
 				System.out.println("go again? (1) for yes");
 				int go = scan.nextInt();
