@@ -6,11 +6,10 @@ import java.util.regex.Pattern;
 import java.io.*;
 
 import org.apache.log4j.Logger;
-import seven.ui.Letter;
-import seven.ui.Player;
-import seven.ui.PlayerBids;
-import seven.ui.Scrabble;
-import seven.ui.SecretState;
+import seven.f10.g3.DataMine.ItemSet;
+import seven.f10.g3.LetterMine.LetterSet;
+import seven.ui.*;
+
 
 /**
  * @author David, Elba, and Lauren
@@ -30,7 +29,6 @@ public class OurPlayer implements Player {
 	private int highBid = 5;
 	private String highWord = "";
 	private int highWordAmt = 0;
-	private ArrayList<String> seven_letter_words;
 
 	// For use to keep track of market value of letters
 	private int[] bidTimes = new int[26];
@@ -49,9 +47,7 @@ public class OurPlayer implements Player {
 		// Initialize Trie
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
-			// Read each line and then add word to trie
 			while ((line = reader.readLine()) != null) {
-
 				line = line.toUpperCase();
 				String[] l = line.split(", ");
 				t.insert(l[0], l[1]);
@@ -68,29 +64,9 @@ public class OurPlayer implements Player {
 	public void Register() {
 		combination_list_short = new ArrayList<String>();
 		combination_list_long = new ArrayList<String>();
-		ArrayList<String> seven_letter_words = new ArrayList<String>();
-		String filename7 = "src/seven/f10/g3/alpha-smallwordlist7.txt";
-		String line = "";
-		BufferedReader reader7;
-		try {
-			reader7 = new BufferedReader(new FileReader(filename7));
-			while ((line = reader7.readLine()) != null) {
 
-				line = line.toUpperCase();
-				String[] l = line.split(", ");
-				seven_letter_words.add(l[0]);
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		// Instantiate the market value arrays 
-		for(int i = 0; i < 26; i++)
-		{
+		// Instantiate the market value arrays
+		for (int i = 0; i < 26; i++) {
 			bidTimes[i] = 0;
 			bidSums[i] = 0;
 		}
@@ -120,66 +96,108 @@ public class OurPlayer implements Player {
 			bid = defaultBid(bid, bidLetter);
 
 		// Adjustment bidding according to History
-		double adjust=History.adjust(cachedBids, ourID);
-		return (int)(bid+adjust);
+		double adjust = History.adjust(cachedBids, ourID);
+		return (int) (bid + adjust);
 	}
 
 	public int comparisonBid(int bid, Letter bidLetter) {
 
-		int posOnRack = numberOfPossibilitisOnRack(); // Do we want to search whole rack or just a
-		// subset
+		int posOnRack = numberOfPossibilities(currentRack.getCharArray()); 
 
-		for (char c = 'A'; c <= 'Z'; c++) {//How do we want to order this?
-			
+		char[] rack = new char[currentRack.size() + 1];
+		for(int i = 0; i < currentRack.size(); i++)
+			rack[i] = currentRack.get(i).getL();
+		rack[rack.length - 1] = bidLetter.getAlphabet();
+		
+		int posOnRackPlus = numberOfPossibilities(rack);
+		
+		/*double[] alphaCounts = new double[26];
+		double[] sortedCounts = new double[26];
+		char[] rack = new char[currentRack.size() + 1];
+		for (int i = 0; i < currentRack.size(); i++) {
+			rack[i] = currentRack.get(i).getL();
+		}
+		
+		for (char c = 'A'; c <= 'Z'; c++) {
+			rack[rack.length - 1] = c;
+			System.out.println("Rack is now: " + new String(rack));
+			int temp = numberOfPossibilities(rack);
+			if (temp != 0) {
+				alphaCounts[c - 65] = posOnRack / temp;
+				sortedCounts[c - 65] = posOnRack / temp;
+				System.out.println("adding in: " + posOnRack / temp);
+			}
 		}
 
-		// if greater than threshold, return high bid
+		Arrays.sort(sortedCounts);
+		double comp = sortedCounts[threshold];
+		if (alphaCounts[bidLetter.getAlphabet() - 65] > comp)
+			return (highBid);
+		else
+			return (lowBid);*/
+		
+		if( posOnRack != 0 && posOnRackPlus / posOnRack > .8)
+			return(highBid);
+		else
+			return(lowBid);
+	}
 
-		return (0);
-	}
-	
-	/** A function to quickly get market value as calculated by previous bid wins. */ 
-	public int marketValue(char Letter)
-	{
+	/**
+	 * A function to quickly get market value as calculated by previous bid
+	 * wins.
+	 */
+	public int marketValue(char Letter) {
 		int letterPlace = Letter - 'A';
-		return bidSums[letterPlace] / bidTimes[letterPlace]; 	// return winning bid sums divided by times bid on.
-																// i.e. average winning bid.
-	
+		return bidSums[letterPlace] / bidTimes[letterPlace]; // return winning
+																// bid sums
+																// divided by
+																// times bid on.
+		// i.e. average winning bid.
+
 	}
-	
 	
 	public void printMarketValues()
 	{
 		for(int i = 0; i < 26; i++)
 			l.trace("Letter: " + ('A'+i) + ", Value: " + bidSums[i] / bidTimes[i]);
 	}
-	
-	
-	//How do we want to deal with letters that we don't yet have?
-	public int numberOfPossibilitisOnRack(){
-		
-		int i = 0;
-		String pat = "[?A-";
-		char[] c = currentRack.getCharArray();
-		for(int j = 0; j < c.length; j++){
-			pat += (c[j] + c[j] + "?" + c[j] + "-");
+
+	public int numberOfPossibilities(char[] arr) {
+
+		DataMine mine = null;
+		mine = new LetterMine("src/seven/f10/g3/smallwordlist.txt");
+		mine.buildIndex();
+		ItemSet[] answer = mine.aPriori(0.000001);
+		String[] strarr = new String[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			strarr[i] = Character.toString(arr[i]);
 		}
-        Pattern p = Pattern.compile(pat);
 
-		while (i < seven_letter_words.size()){
-			Matcher m = p.matcher(seven_letter_words.get(i));
-			if(m.find())
-				i++;
-			else
-				seven_letter_words.remove(i);
-		}
-		
-		return(seven_letter_words.size());
-	}
+		LetterSet i = (LetterSet) mine.getCachedItemSet(strarr);
+		int count = 0;
 
-	public int numberOfPossibilities(String letters) {
+		if (null != i) {
+			String[] words = i.getWords();
+			count = words.length;
+		} 
 
-		return (1);
+		/*
+		 * DataMine mine = null; mine = new
+		 * LetterMine("src/seven/f10/g3/smallwordlist.txt"); mine.buildIndex();
+		 * ItemSet[] answer = mine.aPriori(0.000001); String[] args = {"A", "A",
+		 * "B", "C", "R", "T"}; LetterSet i = (LetterSet)
+		 * mine.getCachedItemSet(args); System.out.println("alive and well: " +
+		 * answer.length + " itemsets total"); if (null != i) { String[] words =
+		 * i.getWords(); System.out.format(
+		 * "Itemset [%s] has %d associated words:\n", new Object[]{i.getKey(),
+		 * words.length} ); for (String w : words) { System.out.println(w); } }
+		 * else { System.out.format( "No words contain the letters %s\n", new
+		 * Object[]{ Arrays.deepToString(args)} ); }
+		 * 
+		 * return(0);
+		 */
+
+		return (count);
 	}
 
 	public int defaultBid(int bid, Letter bidLetter) {
@@ -211,7 +229,6 @@ public class OurPlayer implements Player {
 		if (bid == lowBid)// If we still have not decided we need it, then we
 		// search every possible combination
 		{
-			System.out.println("look for a completely new word");
 			String temp = getHighWord();
 			if (getWordAmount(temp) > highWordAmt)
 				bid = highBid;
@@ -245,7 +262,7 @@ public class OurPlayer implements Player {
 					want));
 			setHighs();
 		}
-		
+
 		// get bid info to add to the market value statistics
 		//int letterPlace = b.getTargetLetter().getAlphabet() - 'A';	// get letter place
 		//bidTimes[letterPlace]++;									// got bid on 
@@ -273,8 +290,6 @@ public class OurPlayer implements Player {
 		char[] rack = new char[currentRack.size()];
 		rack = currentRack.getCharArray();
 		Arrays.sort(rack);
-
-		System.out.println("finding word for: " + new String(rack));
 
 		// Look in trie for words
 		String temp = new String(rack);
