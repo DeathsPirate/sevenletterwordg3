@@ -158,7 +158,6 @@ public class OurPlayer implements Player {
 			strarr[i] = Character.toString(arr[i]);
 		}
 
-		ItemSet[] answer = mine.aPriori(0.000001);
 		LetterSet i = (LetterSet) mine.getCachedItemSet(strarr);
 		int count = 0;
 
