@@ -353,34 +353,7 @@ public class OurPlayer implements Player {
 	 * l.trace("after: " + old_list.get(i)+ "\n"); keepgoing = true; } } } i =
 	 * 0; } l.trace("returning"); return old_list; }
 	 */
-
-	private double bidRef(int round) {
-		if (cachedBids.size() == 0)
-			return 0;
-		PlayerBids bid = cachedBids.get(round);
-		int sum = 0;
-		int top = 0;
-		ListIterator<Integer> it = bid.getBidvalues().listIterator();
-		while (it.hasNext()) {
-			int temp = it.next();
-			if (temp > top)
-				top = temp;
-			sum += temp;
-			// sum+=it.next();
-		}
-
-		double refValue = 0.5 + 1.000 * (sum - top)
-				/ (bid.getBidvalues().size() - 1) / top;
-		double avg = 1.000 * sum / bid.getBidvalues().size();
-		double ref = refValue * (avg - bid.getBidvalues().get(ourID));
-		/*
-		 * l.trace("refValue: "+refValue); l.trace("avg: "+avg);
-		 * l.trace("outID: "+bid.getBidvalues().get(ourID));
-		 * l.trace("ref: "+ref);
-		 */
-		return ref;
-	}
-
+	
 	private int getWordAmount(String word) {
 
 		char[] c = word.toCharArray();
