@@ -35,9 +35,6 @@ class TrieNode<AnyType> {
 		children = new ArrayList<TrieNode>();
 		word = w;
 		realWord = s;
-		
-		if(word == true)
-			System.out.println("real word is: " + realWord);
 	}
 
 	/**
@@ -89,7 +86,6 @@ class TrieNode<AnyType> {
 	public void changeWord(String r) {
 		word = true;
 		realWord = r;
-		System.out.println("Updated: " + r + ", element is: " + element);
 	}
 
 	AnyType element; // The data in the node
