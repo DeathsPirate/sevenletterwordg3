@@ -4,8 +4,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
+
 import org.apache.log4j.Logger;
-import seven.ui.*;
+import seven.ui.Letter;
+import seven.ui.Player;
+import seven.ui.PlayerBids;
+import seven.ui.Scrabble;
+import seven.ui.SecretState;
 
 /**
  * @author David, Elba, and Lauren
@@ -18,7 +23,6 @@ public class OurPlayer implements Player {
 	private ArrayList<PlayerBids> cachedBids;
 	public int ourID;
 	static private TrieTree<String> t;
-	static private TrieTree<String> t7;
 	private ArrayList<String> combination_list_short;
 	private ArrayList<String> combination_list_long;
 	protected Logger l = Logger.getLogger(this.getClass());
@@ -27,15 +31,18 @@ public class OurPlayer implements Player {
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private ArrayList<String> seven_letter_words;
-	
+
 	// For use to keep track of market value of letters
 	private int[] bidTimes = new int[26];
 	private int[] bidSums = new int[26];
 
+	// Letter Frequency Array
+	private int[] letterFrequency = {9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 
+										1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
+
 	static {
 
 		String filename = "src/seven/f10/g3/alpha-smallwordlist.txt";
-		String filename7 = "src/seven/f10/g3/alpha-smallwordlist7-allcombos.txt";
 		String line = "";
 		t = new TrieTree<String>();
 
@@ -134,7 +141,7 @@ public class OurPlayer implements Player {
 	/** A function to quickly get market value as calculated by previous bid wins. */ 
 	public int marketValue(char Letter)
 	{
-		int letterPlace = Letter - 'A';
+		int letterPlace = Letter - 'a';
 		return bidSums[letterPlace] / bidTimes[letterPlace]; 	// return winning bid sums divided by times bid on.
 																// i.e. average winning bid.
 	
@@ -144,7 +151,7 @@ public class OurPlayer implements Player {
 	public void printMarketValues()
 	{
 		for(int i = 0; i < 26; i++)
-			l.trace("Letter: " + ('A'+i) + ", Value: " + bidSums[i] / bidTimes[i]);
+			l.trace("Letter: " + ('a'+i) + ", Value: " + bidSums[i] / bidTimes[i]);
 	}
 	
 	
@@ -240,12 +247,12 @@ public class OurPlayer implements Player {
 		}
 		
 		// get bid info to add to the market value statistics
-		//int letterPlace = b.getTargetLetter().getAlphabet() - 'A';	// get letter place
-		//bidTimes[letterPlace]++;									// got bid on 
-		//bidSums[letterPlace]+= b.getWinAmmount();					// add to win amount
+		int letterPlace = b.getTargetLetter().getAlphabet() - 'a';	// get letter place
+		bidTimes[letterPlace]++;									// got bid on 
+		bidSums[letterPlace]+= b.getWinAmmount();					// add to win amount
 		
 		// to print the market values at the end of bidding. 
-		//printMarketValues();
+		printMarketValues();
 	}
 
 	/** Reset high word and high score */
@@ -320,6 +327,18 @@ public class OurPlayer implements Player {
 		}
 	}
 
+	/*
+	 * private ArrayList<String> sort_by_length(ArrayList<String> old_list) {
+	 * 
+	 * l.trace("here"); int i = 0; int j = 0; Boolean keepgoing = true; while
+	 * (keepgoing == true) { keepgoing = false; for (i = 0; i < old_list.size();
+	 * i++) { for (j = 0; j < old_list.size(); j++) { if
+	 * (old_list.get(i).length() < old_list.get(j).length()) {
+	 * l.trace("before: " + old_list.get(i)); Collections.swap(old_list, i, j);
+	 * l.trace("after: " + old_list.get(i)+ "\n"); keepgoing = true; } } } i =
+	 * 0; } l.trace("returning"); return old_list; }
+	 */
+
 	private double bidRef(int round) {
 		if (cachedBids.size() == 0)
 			return 0;
@@ -364,11 +383,9 @@ public class OurPlayer implements Player {
 	 */
 	public boolean sevenLetterWordLeft() {
 		
-		/*if(seven_letter_words.size() > 0)
+		if(seven_letter_words.size() > 0)
 			return (true);
 		else
-			return(false);*/
-		
-		return(false);
+			return(false);
 	}
 }
