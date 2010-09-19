@@ -1,8 +1,6 @@
 package seven.f10.g3;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.io.*;
 
 import org.apache.log4j.Logger;
@@ -25,13 +23,14 @@ public class OurPlayer implements Player {
 	private ArrayList<String> combination_list_short;
 	private ArrayList<String> combination_list_long;
 	protected Logger l = Logger.getLogger(this.getClass());
-	private int lowBid = 0;
+	private int lowBid = 1;
 	private int highBid = 5;
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private int oldPosOnRackPlus =0;
 	private int oldPosOnRack = 0;
 	private Boolean gotLetter = false;
+	private static DataMine mine;
 
 	// For use to keep track of market value of letters
 	private int[] bidTimes = new int[26];
@@ -55,6 +54,10 @@ public class OurPlayer implements Player {
 				String[] l = line.split(", ");
 				t.insert(l[0], l[1]);
 			}
+			
+			mine = null;
+			mine = new LetterMine("src/seven/f10/g3/smallwordlist.txt");
+			mine.buildIndex();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -150,15 +153,12 @@ public class OurPlayer implements Player {
 
 	public int numberOfPossibilities(char[] arr) {
 
-		DataMine mine = null;
-		mine = new LetterMine("src/seven/f10/g3/smallwordlist.txt");
-		mine.buildIndex();
-		ItemSet[] answer = mine.aPriori(0.000001);
 		String[] strarr = new String[arr.length];
 		for (int i = 0; i < arr.length; i++) {
 			strarr[i] = Character.toString(arr[i]);
 		}
 
+		ItemSet[] answer = mine.aPriori(0.000001);
 		LetterSet i = (LetterSet) mine.getCachedItemSet(strarr);
 		int count = 0;
 
