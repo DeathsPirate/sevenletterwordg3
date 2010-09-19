@@ -4,13 +4,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
-
 import org.apache.log4j.Logger;
-import seven.ui.Letter;
-import seven.ui.Player;
-import seven.ui.PlayerBids;
-import seven.ui.Scrabble;
-import seven.ui.SecretState;
+import seven.ui.*;
 
 /**
  * @author David, Elba, and Lauren
@@ -23,6 +18,7 @@ public class OurPlayer implements Player {
 	private ArrayList<PlayerBids> cachedBids;
 	public int ourID;
 	static private TrieTree<String> t;
+	static private TrieTree<String> t7;
 	private ArrayList<String> combination_list_short;
 	private ArrayList<String> combination_list_long;
 	protected Logger l = Logger.getLogger(this.getClass());
@@ -39,6 +35,7 @@ public class OurPlayer implements Player {
 	static {
 
 		String filename = "src/seven/f10/g3/alpha-smallwordlist.txt";
+		String filename7 = "src/seven/f10/g3/alpha-smallwordlist7-allcombos.txt";
 		String line = "";
 		t = new TrieTree<String>();
 
@@ -323,18 +320,6 @@ public class OurPlayer implements Player {
 		}
 	}
 
-	/*
-	 * private ArrayList<String> sort_by_length(ArrayList<String> old_list) {
-	 * 
-	 * l.trace("here"); int i = 0; int j = 0; Boolean keepgoing = true; while
-	 * (keepgoing == true) { keepgoing = false; for (i = 0; i < old_list.size();
-	 * i++) { for (j = 0; j < old_list.size(); j++) { if
-	 * (old_list.get(i).length() < old_list.get(j).length()) {
-	 * l.trace("before: " + old_list.get(i)); Collections.swap(old_list, i, j);
-	 * l.trace("after: " + old_list.get(i)+ "\n"); keepgoing = true; } } } i =
-	 * 0; } l.trace("returning"); return old_list; }
-	 */
-
 	private double bidRef(int round) {
 		if (cachedBids.size() == 0)
 			return 0;
@@ -379,9 +364,11 @@ public class OurPlayer implements Player {
 	 */
 	public boolean sevenLetterWordLeft() {
 		
-		if(seven_letter_words.size() > 0)
+		/*if(seven_letter_words.size() > 0)
 			return (true);
 		else
-			return(false);
+			return(false);*/
+		
+		return(false);
 	}
 }
