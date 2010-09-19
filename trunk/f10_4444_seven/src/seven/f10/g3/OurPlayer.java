@@ -134,7 +134,7 @@ public class OurPlayer implements Player {
 	/** A function to quickly get market value as calculated by previous bid wins. */ 
 	public int marketValue(char Letter)
 	{
-		int letterPlace = Letter - 'a';
+		int letterPlace = Letter - 'A';
 		return bidSums[letterPlace] / bidTimes[letterPlace]; 	// return winning bid sums divided by times bid on.
 																// i.e. average winning bid.
 	
@@ -144,7 +144,7 @@ public class OurPlayer implements Player {
 	public void printMarketValues()
 	{
 		for(int i = 0; i < 26; i++)
-			l.trace("Letter: " + ('a'+i) + ", Value: " + bidSums[i] / bidTimes[i]);
+			l.trace("Letter: " + ('A'+i) + ", Value: " + bidSums[i] / bidTimes[i]);
 	}
 	
 	
@@ -240,12 +240,12 @@ public class OurPlayer implements Player {
 		}
 		
 		// get bid info to add to the market value statistics
-		int letterPlace = b.getTargetLetter().getAlphabet() - 'a';	// get letter place
-		bidTimes[letterPlace]++;									// got bid on 
-		bidSums[letterPlace]+= b.getWinAmmount();					// add to win amount
+		//int letterPlace = b.getTargetLetter().getAlphabet() - 'A';	// get letter place
+		//bidTimes[letterPlace]++;									// got bid on 
+		//bidSums[letterPlace]+= b.getWinAmmount();					// add to win amount
 		
 		// to print the market values at the end of bidding. 
-		printMarketValues();
+		//printMarketValues();
 	}
 
 	/** Reset high word and high score */

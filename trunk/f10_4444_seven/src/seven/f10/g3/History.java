@@ -63,7 +63,10 @@ public class History
 		double topWeight;
 		double topDevMeanDiff=top-devMean;
 		double topWeightC=topWeightAtStdDev/(1-topWeightAtStdDev)*stdDev;
-		topWeight=topWeightC/(topWeightC+topDevMeanDiff);
+		if (topDevMeanDiff==0)
+			topWeight=1;
+		else
+			topWeight=topWeightC/(topWeightC+topDevMeanDiff);
 		
 		double adjust=top*topWeight+devMean*(1-topWeight)-bid.getBidvalues().get(ourID);
 		l.trace("Top="+top+",StdDev="+stdDev+",Mean="+mean+",DevMean="+devMean
