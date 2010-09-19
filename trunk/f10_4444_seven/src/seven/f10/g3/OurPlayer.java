@@ -115,16 +115,9 @@ public class OurPlayer implements Player {
 		else
 			bid = defaultBid(bid, bidLetter);
 
-		// reference to bids from others
-		double ref = bidRef(cachedBids.size() - 1);
-		int refInt = Double.valueOf(ref).intValue();
-		/*
-		 * l.trace("ref: " + ref); l.trace("refInt: " + refInt);
-		 * l.trace("result: " + bid); l.trace("result+refInt: " + (bid +
-		 * refInt));
-		 */
-
-		return (bid + refInt);
+		// Adjustment bidding according to History
+		double adjust=History.adjust(cachedBids, ourID);
+		return (int)(bid+adjust+0.5);
 	}
 
 	public int comparisonBid(int bid, Letter bidLetter) {
