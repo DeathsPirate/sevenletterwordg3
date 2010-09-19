@@ -383,10 +383,12 @@ public class OurPlayer implements Player {
 	 */
 	public boolean sevenLetterWordLeft() {
 		
-		if(seven_letter_words.size() > 0)
+		/*if(seven_letter_words.size() > 0)
 			return (true);
 		else
 			return(false);
+		*/
+		return true;
 	}
 	
 	public boolean lettersPossiblyLeft(char Letter){
