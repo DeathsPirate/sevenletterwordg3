@@ -13,14 +13,10 @@ public class OurPlayerTester{
 	
 		OurPlayer p = new OurPlayer();
 		p.Register();
-		ArrayList<Letter> secretLetters = new ArrayList<Letter>();
-		//abactor
-		secretLetters.add(new Letter('A', 1));
+		ArrayList<Letter> secretLetters = new ArrayList<Letter>();		secretLetters.add(new Letter('A', 1));
 		secretLetters.add(new Letter('B', 1));
 		secretLetters.add(new Letter('A', 1));
-		secretLetters.add(new Letter('C', 1));
 		secretLetters.add(new Letter('T', 1));
-		secretLetters.add(new Letter('R', 1));
 		
 		secretstate.setSecretLetters(secretLetters);
 		int bid = p.Bid(bidLetter, PlayerBidList, total_rounds, PlayerList, 
