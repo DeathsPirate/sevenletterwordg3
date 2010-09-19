@@ -1,4 +1,4 @@
-package seven.f10.g3;
+spackage seven.f10.g3;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -31,6 +31,10 @@ public class OurPlayer implements Player {
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private ArrayList<String> seven_letter_words;
+	
+	// For use to keep track of market value of letters
+	private int[] bidTimes = new int[26];
+	private int[] bidSums = new int[26];
 
 	static {
 
@@ -78,6 +82,13 @@ public class OurPlayer implements Player {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		// Instantiate the market value arrays 
+		for(int i = 0; i < 26; i++)
+		{
+			bidTimes[i] = 0;
+			bidSums[i] = 0;
 		}
 	}
 
@@ -129,6 +140,24 @@ public class OurPlayer implements Player {
 
 		return (0);
 	}
+	
+	/* A function to quickly get market value as calculated by previous bid wins. */ 
+	public int marketValue(char Letter)
+	{
+		int letterPlace = Letter - 'a';
+		return bidSums[letterPlace] / bidTimes[letterPlace]; 	// return winning bid sums divided by times bid on.
+																// i.e. average winning bid.
+	
+	}
+	
+	
+	public void printMarketValues()
+	{
+		for(int i = 0; i < 26; i++)
+			l.trace("Letter: " + ('a'+i) + ", Value: " + bidSums[i] / bidTimes[i]);
+	}
+	
+	
 	//How do we want to deal with letters that we don't yet have?
 	public int numberOfPossibilitisOnRack(){
 		
@@ -219,6 +248,14 @@ public class OurPlayer implements Player {
 					want));
 			setHighs();
 		}
+		
+		// get bid info to add to the market value statistics
+		int letterPlace = b.getTargetLetter().getAlphabet() - 'a';	// get letter place
+		bidTimes[letterPlace]++;									// got bid on 
+		bidSums[letterPlace]+= b.getWinAmmount();					// add to win amount
+		
+		// to print the market values at the end of bidding. 
+		printMarketValues();
 	}
 
 	/** Reset high word and high score */
