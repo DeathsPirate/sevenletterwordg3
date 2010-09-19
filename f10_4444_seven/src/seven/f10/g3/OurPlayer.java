@@ -1,4 +1,4 @@
-spackage seven.f10.g3;
+package seven.f10.g3;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -141,7 +141,7 @@ public class OurPlayer implements Player {
 		return (0);
 	}
 	
-	/* A function to quickly get market value as calculated by previous bid wins. */ 
+	/** A function to quickly get market value as calculated by previous bid wins. */ 
 	public int marketValue(char Letter)
 	{
 		int letterPlace = Letter - 'a';
