@@ -29,6 +29,9 @@ public class OurPlayer implements Player {
 	private int highBid = 5;
 	private String highWord = "";
 	private int highWordAmt = 0;
+	private int oldPosOnRackPlus =0;
+	private int oldPosOnRack = 0;
+	private Boolean gotLetter = false;
 
 	// For use to keep track of market value of letters
 	private int[] bidTimes = new int[26];
@@ -102,7 +105,14 @@ public class OurPlayer implements Player {
 
 	public int comparisonBid(int bid, Letter bidLetter) {
 
-		int posOnRack = numberOfPossibilities(currentRack.getCharArray()); 
+		int posOnRack = 0;
+		if(oldPosOnRack == 0)
+			posOnRack = numberOfPossibilities(currentRack.getCharArray());
+		else if(gotLetter == true)
+			posOnRack = oldPosOnRackPlus;
+		else
+			posOnRack = oldPosOnRack;
+		oldPosOnRack = posOnRack;
 
 		char[] rack = new char[currentRack.size() + 1];
 		for(int i = 0; i < currentRack.size(); i++)
@@ -110,31 +120,7 @@ public class OurPlayer implements Player {
 		rack[rack.length - 1] = bidLetter.getAlphabet();
 		
 		int posOnRackPlus = numberOfPossibilities(rack);
-		
-		/*double[] alphaCounts = new double[26];
-		double[] sortedCounts = new double[26];
-		char[] rack = new char[currentRack.size() + 1];
-		for (int i = 0; i < currentRack.size(); i++) {
-			rack[i] = currentRack.get(i).getL();
-		}
-		
-		for (char c = 'A'; c <= 'Z'; c++) {
-			rack[rack.length - 1] = c;
-			System.out.println("Rack is now: " + new String(rack));
-			int temp = numberOfPossibilities(rack);
-			if (temp != 0) {
-				alphaCounts[c - 65] = posOnRack / temp;
-				sortedCounts[c - 65] = posOnRack / temp;
-				System.out.println("adding in: " + posOnRack / temp);
-			}
-		}
-
-		Arrays.sort(sortedCounts);
-		double comp = sortedCounts[threshold];
-		if (alphaCounts[bidLetter.getAlphabet() - 65] > comp)
-			return (highBid);
-		else
-			return (lowBid);*/
+		oldPosOnRackPlus = posOnRackPlus;
 		
 		if( posOnRack != 0 && posOnRackPlus / posOnRack > .8)
 			return(highBid);
@@ -261,7 +247,11 @@ public class OurPlayer implements Player {
 			currentRack.add(new RackLetter(b.getTargetLetter().getAlphabet(),
 					want));
 			setHighs();
+			gotLetter = true;
 		}
+		
+		else
+			gotLetter = false;
 
 		// get bid info to add to the market value statistics
 		//int letterPlace = b.getTargetLetter().getAlphabet() - 'A';	// get letter place
