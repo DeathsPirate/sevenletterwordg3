@@ -44,7 +44,7 @@ public class StingyPlayer implements Player {
 		}
 
 		if (null == currentLetters) {
-			currentLetters = new ArrayList<Character>(7);
+			currentLetters = new ArrayList<Character>();
 			ourID = PlayerID;
 			for (Letter l : secretstate.getSecretLetters()) {
 				currentLetters.add(l.getAlphabet());
@@ -70,8 +70,8 @@ public class StingyPlayer implements Player {
 
 	public String returnWord() {
 		checkBid(cachedBids.get(cachedBids.size() - 1));
-		char c[] = new char[7];
-		for (int i = 0; i < 7; i++) {
+		char c[] = new char[currentLetters.size()];
+		for (int i = 0; i < c.length; i++) {
 			c[i] = currentLetters.get(i);
 		}
 		String s = new String(c);

@@ -78,6 +78,7 @@ public class GameController {
         }
         else
         {
+        	System.out.println("Ending round");
             // Before we do the clearance work, let us get the words
             gc_local.PlayerWords.clear();
             for(int loop=0;loop<gc_local.PObjectList.size();loop++)
@@ -90,7 +91,7 @@ public class GameController {
             // Validate and change scores:
             validateAndScore(gc_local);
 
-
+            gc_local.num_leters_done = 0;
             // Get the word from each, calculate score, store words in history
             // Also make a new wordbag
             gc_local.ScrabbleObject.initBag();

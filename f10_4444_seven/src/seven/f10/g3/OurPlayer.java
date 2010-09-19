@@ -117,7 +117,7 @@ public class OurPlayer implements Player {
 
 		// Adjustment bidding according to History
 		double adjust=History.adjust(cachedBids, ourID);
-		return (int)(bid+adjust+0.5);
+		return (int)(bid+adjust);
 	}
 
 	public int comparisonBid(int bid, Letter bidLetter) {

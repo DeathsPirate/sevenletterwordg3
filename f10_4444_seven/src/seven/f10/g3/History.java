@@ -65,10 +65,13 @@ public class History
 		double topWeightC=topWeightAtStdDev/(1-topWeightAtStdDev)*stdDev;
 		topWeight=topWeightC/(topWeightC+topDevMeanDiff);
 		
-		double adjust=1+top*topWeight+devMean*(1-topWeight)-bid.getBidvalues().get(ourID);
+		double adjust=top*topWeight+devMean*(1-topWeight)-bid.getBidvalues().get(ourID);
 		l.trace("Top="+top+",StdDev="+stdDev+",Mean="+mean+",DevMean="+devMean
 			+",topWeight="+topWeight+",Adjust="+adjust);
-		return adjust;
+		if (adjust>=0)
+			return adjust+0.5;
+		else
+			return adjust-0.5;
 	}
 	
 	public static double getMedian(ArrayList<Integer> arrayList)
