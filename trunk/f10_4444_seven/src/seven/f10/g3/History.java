@@ -11,10 +11,10 @@ import seven.ui.PlayerBids;
 public class History
 {
 	private static ArrayList<BidLog> bidLogList=new ArrayList<BidLog>();
-	private static final Logger l=Logger.getLogger(History.class);;
+	private static final Logger l=Logger.getLogger(History.class);
 	private static double topWeightAtStdDev=0.3;
 	
-	public static double adjust(ArrayList<PlayerBids> cachedBids, int ourID)
+	public static double adjust(String b, ArrayList<PlayerBids> cachedBids, int ourID)
 	{
 		if (cachedBids.size()==0)
 			return 0;
@@ -69,8 +69,8 @@ public class History
 			topWeight=topWeightC/(topWeightC+topDevMeanDiff);
 		
 		double adjust=top*topWeight+devMean*(1-topWeight)-bid.getBidvalues().get(ourID);
-		l.trace("Top="+top+",StdDev="+stdDev+",Mean="+mean+",DevMean="+devMean
-			+",topWeight="+topWeight+",Adjust="+adjust);
+		/*l.trace("Top="+top+",StdDev="+stdDev+",Mean="+mean+",DevMean="+devMean
+			+",topWeight="+topWeight+",Adjust="+adjust);*/
 		if (adjust>=0)
 			return adjust+0.5;
 		else
