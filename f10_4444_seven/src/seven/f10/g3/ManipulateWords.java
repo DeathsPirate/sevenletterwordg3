@@ -25,7 +25,7 @@ public class ManipulateWords {
 			while ((strLine = br.readLine()) != null) {
 					if(strLine.length() == 7)
 						out7.write(Sort(strLine) + ", " + strLine + "\n");
-					else out.write(Sort(strLine) + ", " + strLine + "\n");
+					out.write(Sort(strLine) + ", " + strLine + "\n");
 			}
 
 			// Close the stream
