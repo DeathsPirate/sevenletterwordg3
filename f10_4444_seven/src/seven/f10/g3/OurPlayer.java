@@ -388,6 +388,7 @@ public class OurPlayer implements Player {
 	 */
 	public boolean sevenLetterWordLeft() {
 		
+		// Be optimistic!
 		boolean sevenLeft = false;
 		
 		// If the size our rack plus the number of rounds
@@ -398,6 +399,29 @@ public class OurPlayer implements Player {
 		if(this.numRoundsLeft() + currentRack.size() < 7)
 			sevenLeft = false;
 		
+		// copy current rack over, need a temp
+		Rack fakeRack = new Rack();
+		for(int i = 0; i < currentRack.size(); i++)
+			fakeRack.add(currentRack.get(i));
+		
+		// copy current bid times, need a temp
+		int[] fakeBidTimes = new int[bidTimes.length];
+		for(int i = 0; i < bidTimes.length; i++)
+			fakeBidTimes[i] = bidTimes[i];
+		
+		// TODO
+		while(sevenLeft == false) {
+			while(fakeRack.size() < 7) {
+				for (char c = 'A'; c <= 'Z'; c++) {
+					while (this.letterPossiblyLeft(c)) {
+						fakeRack.add(new RackLetter(c, true));
+						fakeBidTimes[c - 'A']++;
+					}
+				}
+			}
+			if(/* Rack makes a seven letter word */ true) // TRUE
+				sevenLeft = true;
+		}
 		return sevenLeft;
 		
 	}
