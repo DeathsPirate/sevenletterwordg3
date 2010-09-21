@@ -24,7 +24,7 @@ public class OurPlayer implements Player {
 	private ArrayList<String> combination_list_long;
 	protected Logger l = Logger.getLogger(this.getClass());
 	private int lowBid = 1;
-	private int highBid = 5;
+	private int highBid = 10;
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private int oldPosOnRackPlus =0;
