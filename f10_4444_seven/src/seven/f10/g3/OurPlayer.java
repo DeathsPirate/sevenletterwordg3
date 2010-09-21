@@ -25,12 +25,17 @@ public class OurPlayer implements Player {
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private static DataMine mine;
-
+	
+	// To keep track of rounds played and number of
+	// players we're playing against. 
+	int numberOfRoundsPlayed;
+	int numberOfPlayers = 0;
+	
 	// For use to keep track of market value of letters
 	private int[] bidTimes = new int[26];
 	private int[] bidSums = new int[26];
 
-	// Letter Frequency Array
+	// Letter Frequency Array, as given by Scrabble rules
 	private int[] letterFrequency = { 9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2,
 			6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1 };
 
@@ -61,6 +66,7 @@ public class OurPlayer implements Player {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 
 	/** When our player loads */
@@ -73,6 +79,12 @@ public class OurPlayer implements Player {
 			bidTimes[i] = 0;
 			bidSums[i] = 0;
 		}
+		
+		// Keep count of how many rounds we've played.
+		// There seems to be no way to get the number 
+		// people we're playing against so this is
+		// kind of a hack, and messy. 
+		numberOfRoundsPlayed = 0;
 	}
 
 	/** Player Bids */
@@ -121,7 +133,7 @@ public class OurPlayer implements Player {
 		int[] sortedAmounts = new int[26];
 
 		for (char c = 'A'; c <= 'Z'; c++) {
-			if (lettersPossiblyLeft(c)) {
+			if (letterPossiblyLeft(c)) {
 				rack[rack.length - 1] = c;
 				int pos = numberOfPossibilities(rack);
 				sortedAmounts[c - 65] = pos;
@@ -148,13 +160,12 @@ public class OurPlayer implements Player {
 	public int marketValue(char Letter) {
 		int letterPlace = Letter - 'A';
 		return bidSums[letterPlace] / bidTimes[letterPlace]; // return winning
-		// bid sums
-		// divided by
-		// times bid on.
-		// i.e. average winning bid.
-
 	}
 
+	/** 
+	 * A function to be able to print the marketValue of all letters.
+	 * To be used for information tracking. 
+	 */
 	public void printMarketValues() {
 		for (int i = 0; i < 26; i++)
 			l.trace("Letter: " + ('A' + i) + ", Value: " + bidSums[i]
@@ -233,7 +244,13 @@ public class OurPlayer implements Player {
 	/** Check to see if we win the bid, if so add it to your rack */
 	private void checkBid(PlayerBids b) {
 		Boolean want = false;
-
+		numberOfRoundsPlayed++; 		// We've played a round
+		
+		// This will run every time we play, and its value
+		// should not change.
+		// It's bad design but it works. 
+		numberOfPlayers = b.getBidvalues().size();
+		
 		// check to see if we actually wanted it
 		if (ourID == b.getWinnerID() && b.getWinAmmount() > 0)
 			want = true;
@@ -352,19 +369,46 @@ public class OurPlayer implements Player {
 		return (amt);
 	}
 
+	
+	/**
+	 * A simple function to return the number of letters left
+	 * to bid on, i.e. number of rounds left.
+	 * @return
+	 */
+	public int numRoundsLeft() {
+		// For each player, 8 letters are put in the bag. 
+		// So to see how many letters we have left to bid on, 
+		// AKA the number of rounds left, we subtract nOP*8 - nORP. 
+		return (numberOfPlayers*8) - numberOfRoundsPlayed;
+		
+	}
 	/**
 	 * Lets us know if it is possible to get a seven letter word with the
-	 * remaining letters
+	 * remaining letters. 
 	 */
 	public boolean sevenLetterWordLeft() {
-
-		/*
-		 * if(seven_letter_words.size() > 0) return (true); else return(false);
-		 */
-		return true;
+		
+		boolean sevenLeft = false;
+		
+		// If the size our rack plus the number of rounds
+		// left don't even add up to seven, it's impossible
+		// to get a seven letter word. 
+		//
+		// This is the most basic case.
+		if(this.numRoundsLeft() + currentRack.size() < 7)
+			sevenLeft = false;
+		
+		return sevenLeft;
+		
 	}
 
-	public boolean lettersPossiblyLeft(char Letter) {
+	/**
+	 * Returns whether it's even possible that a certain
+	 * letter is still in the bag to play on.
+	 * 
+	 * Depends on scrabble letter frequency.  
+	 */
+	public boolean letterPossiblyLeft(char Letter) {
 
 		if (bidTimes[Letter - 'A'] == letterFrequency[Letter - 'A'])
 			return false;
