@@ -72,7 +72,6 @@ public abstract class DataMine {
 
        public ItemSet getCachedItemSet(String[] terms) {
                String lookup = makeKey(terms);
-               logger.debug("lookup "+lookup);
                return itemCache.get(lookup);
        }
 
