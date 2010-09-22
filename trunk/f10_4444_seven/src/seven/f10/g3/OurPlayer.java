@@ -26,6 +26,8 @@ public class OurPlayer implements Player {
 	private int highWordAmt = 0;
 	private static DataMine mine;
 	private Boolean sevenLetterWordLeft = true;
+	private History h;
+	private int amountBidOnRound = 0;
 	
 	// To keep track of rounds played and number of
 	// players we're playing against. 
@@ -74,6 +76,7 @@ public class OurPlayer implements Player {
 	public void Register() {
 		combination_list_short = new ArrayList<String>();
 		combination_list_long = new ArrayList<String>();
+		h = new History();
 
 		// Instantiate the market value arrays
 		for (int i = 0; i < 26; i++) {
@@ -112,7 +115,10 @@ public class OurPlayer implements Player {
 			bidStrategy = defaultBid(bidLetter);
 
 		// Adjusted Bid
-		int adjustedBid = History.adjust(bidStrategy, bidLetter, cachedBids, ourID);
+		int adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids,
+				ourID);
+		if(amountBidOnRound + adjustedBid > 56) //Make sure that we are not bidding too much
+			adjustedBid  = 56 - amountBidOnRound;
 		return adjustedBid;
 	}
 
