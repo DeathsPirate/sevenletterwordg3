@@ -83,7 +83,6 @@ public abstract class DataMine {
         * @return all itemsets of three or fewer items that have at least the given support.
         */
        public ItemSet[] aPriori(double minsupport) {
-               logger.debug("Entering a priori method");
 
                ArrayList<ArrayList<ItemSet>> roundLists = new ArrayList<ArrayList<ItemSet>>();
                if (null == this.singletonSets) {
@@ -100,16 +99,13 @@ public abstract class DataMine {
                        if (minDocs < tmpSupport) {
                                minDocs++;
                        }
-                       logger.debug("MinDocs set to " + minDocs);
                }
                ArrayList<ItemSet> allRounds = new ArrayList<ItemSet>();
                // we don't actually need round 0 any more, but we keep it around
                // for tradition's sake
                for (int roundnum = 0; roundnum <= max_itemset_size; roundnum++) {
-                       logger.debug("Starting round " + roundnum + " of a priori tests");
                        /* only slightly less naive implementation: */
                        ArrayList<ItemSet> thisRound = runAPRound(roundLists, roundnum, minsupport);
-                       logger.debug("Found " + thisRound.size() + " itemsets");
                        roundLists.add(thisRound);
                        if (roundnum > 0) allRounds.addAll(thisRound);
                }
@@ -138,7 +134,6 @@ public abstract class DataMine {
                                if (curr.getSupport() >= minsupport) {
                                        String k = curr.getKey();
                                        singletonKeys.add(curr.getKey());
-                                       logger.debug("putting "+k+","+curr);
                                        itemCache.put(k, curr);
                                }
                                else i.remove();
@@ -218,7 +213,6 @@ public abstract class DataMine {
                                }
                                ItemSet combined = baseSet.intersect(singleton, isFinal);
                                if (null != combined && combined.getSupport() >= minsupport) {
-                                   logger.debug("putting "+combined.getKey()+","+combined);
                                        itemCache.put(combined.getKey(), combined);
                                        if (roundnum != combined.getItems().length) {
                                                logger.error("Somehow got " + combined.getKey() + " from "  + baseSet.getKey() + " and " + singleton.getKey());
@@ -228,8 +222,6 @@ public abstract class DataMine {
                        }
                        indexLookup.put(baseSet.getKey(), thisRound.size());
                }
-               logger.debug("Count for short circuit 3 sets is "+ skipCount);
-               logger.debug("Actually evaluated " + this_set_number + " itemsets");
                return thisRound;
        }
 
