@@ -14,12 +14,12 @@ public class OurPlayerTester{
 		OurPlayer p = new OurPlayer();
 		p.Register();
 		ArrayList<Letter> secretLetters = new ArrayList<Letter>();		
-		secretLetters.add(new Letter('B', 3));
-		secretLetters.add(new Letter('E', 1));
+		secretLetters.add(new Letter('I', 3));
+		secretLetters.add(new Letter('V', 1));
 		
 		secretstate.setSecretLetters(secretLetters);
 		
-		char[] futureLetters = {'Z', 'I', 'Q', 'U', 'E'};
+		char[] futureLetters = {'T', 'E', 'L', 'H', 'O', 'R'};
 		
 		for(int i = 0; i < futureLetters.length; i++){
 			
@@ -34,7 +34,7 @@ public class OurPlayerTester{
 			p.setHighs();			
 		}
 		
-		System.out.println("Testing bezique: " + p.getWordAmount("BEZIQUE"));
+		p.setHighs();
 	}	
 	static ArrayList<PlayerBids> PlayerBidList = new ArrayList<PlayerBids>();
 	static int total_rounds = 1;
