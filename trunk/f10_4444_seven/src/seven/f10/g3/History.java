@@ -87,8 +87,8 @@ public class History {
 		}
 
 		else {
-			l.trace("Returning: " + frequencyValue[(bidLetterIndex)]);
-			return (frequencyValue[(bidLetterIndex)]);
+			l.trace("Returning: " + frequencyValue[bidLetterIndex]);
+			return (frequencyValue[bidLetterIndex]);
 		}
 
 		l.trace("At end: " + bid);
