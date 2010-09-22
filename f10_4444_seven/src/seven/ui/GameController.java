@@ -28,7 +28,7 @@ public class GameController {
         GameResult gameresult = new GameResult(0, new ArrayList<Integer>());
         int retValue=0;
         // Now we do the program logic stuff
-        log.error("Letters done: " + gc_local.num_leters_done);
+        log.trace("Letters done: " + gc_local.num_leters_done);
         if(gc_local.isMoreBiddingLeft() == true)
         {
             Letter bidLetter = gc_local.ScrabbleObject.getRandomFromBag();
