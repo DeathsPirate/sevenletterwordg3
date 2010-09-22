@@ -25,6 +25,7 @@ public class OurPlayer implements Player {
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private static DataMine mine;
+	private Boolean sevenLetterWordLeft = true;
 	
 	// To keep track of rounds played and number of
 	// players we're playing against. 
@@ -390,8 +391,10 @@ public class OurPlayer implements Player {
 	 * remaining letters. 
 	 */
 	public boolean sevenLetterWordLeft() {
+				
+		if (sevenLetterWordLeft == false)
+			return(false);
 		
-		// Be optimistic!
 		boolean sevenLeft = false;
 		
 		// If the size our rack plus the number of rounds
@@ -412,7 +415,6 @@ public class OurPlayer implements Player {
 		for(int i = 0; i < bidTimes.length; i++)
 			fakeBidTimes[i] = bidTimes[i];
 		
-		// TODO
 		while(sevenLeft == false) {
 			while(fakeRack.size() < 7) {
 				for (char c = 'A'; c <= 'Z'; c++) {
@@ -422,9 +424,11 @@ public class OurPlayer implements Player {
 					}
 				}
 			}
-			if(/* Rack makes a seven letter word */ true) // TRUE
+			if( t.findWord( new String(fakeRack.getCharArray()) ) == true) // TRUE
 				sevenLeft = true;
 		}
+		
+		sevenLetterWordLeft = sevenLeft;
 		return sevenLeft;
 		
 	}
