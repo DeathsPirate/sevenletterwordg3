@@ -26,14 +26,12 @@ public class OurPlayer implements Player {
 	private int highWordAmt = 0;
 	private static DataMine mine;
 	private Boolean sevenLetterWordLeft = true;
-	private int amountBidOnRound = 0;
-	private History h;
-
+	
 	// To keep track of rounds played and number of
-	// players we're playing against.
+	// players we're playing against. 
 	int numberOfRoundsPlayed;
 	int numberOfPlayers = 0;
-
+	
 	// For use to keep track of market value of letters
 	private int[] bidTimes = new int[26];
 	private int[] bidSums = new int[26];
@@ -69,25 +67,24 @@ public class OurPlayer implements Player {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
 
 	/** When our player loads */
 	public void Register() {
 		combination_list_short = new ArrayList<String>();
 		combination_list_long = new ArrayList<String>();
-		amountBidOnRound = 0;
 
 		// Instantiate the market value arrays
 		for (int i = 0; i < 26; i++) {
 			bidTimes[i] = 0;
 			bidSums[i] = 0;
 		}
-
+		
 		// Keep count of how many rounds we've played.
-		// There seems to be no way to get the number
+		// There seems to be no way to get the number 
 		// people we're playing against so this is
-		// kind of a hack, and messy.
+		// kind of a hack, and messy. 
 		numberOfRoundsPlayed = 0;
 	}
 
@@ -115,11 +112,7 @@ public class OurPlayer implements Player {
 			bidStrategy = defaultBid(bidLetter);
 
 		// Adjusted Bid
-		int adjustedBid = History.adjust(bidStrategy, bidLetter, cachedBids,
-				ourID);
-		//Check 7th letter boost (elba will write), bid * 1.1
-		if(amountBidOnRound + adjustedBid > 56) //Make sure that we are not bidding too much
-			adjustedBid  = 56 - amountBidOnRound;
+		int adjustedBid = History.adjust(bidStrategy, bidLetter, cachedBids, ourID);
 		return adjustedBid;
 	}
 
@@ -150,8 +143,8 @@ public class OurPlayer implements Player {
 				}
 			}
 		}
-
-		// Determine high, medium, or low bid
+		
+		//Determine high, medium, or low bid
 		Arrays.sort(sortedAmounts);
 		if (b > sortedAmounts[5])
 			return ("H");
@@ -170,14 +163,16 @@ public class OurPlayer implements Player {
 		return bidSums[letterPlace] / bidTimes[letterPlace]; // return winning
 	}
 
-	/**
-	 * A function to be able to print the marketValue of all letters. To be used
-	 * for information tracking.
+	/** 
+	 * A function to be able to print the marketValue of all letters.
+	 * To be used for information tracking. 
 	 */
 	public void printMarketValues() {
-		for (int i = 0; i < 26; i++) {
+		for (int i = 0; i < 26; i++)
+		{
 			char temp = (char) ('A' + i);
-			l.trace("Letter: " + temp + ", Value: " + bidSums[i] / bidTimes[i]);
+			l.trace("Letter: " + temp + ", Value: " + bidSums[i]
+					/ bidTimes[i]);
 		}
 	}
 
@@ -253,13 +248,13 @@ public class OurPlayer implements Player {
 	/** Check to see if we win the bid, if so add it to your rack */
 	private void checkBid(PlayerBids b) {
 		Boolean want = false;
-		numberOfRoundsPlayed++; // We've played a round
-
+		numberOfRoundsPlayed++; 		// We've played a round
+		
 		// This will run every time we play, and its value
 		// should not change.
-		// It's bad design but it works.
+		// It's bad design but it works. 
 		numberOfPlayers = b.getBidvalues().size();
-
+		
 		// check to see if we actually wanted it
 		if (ourID == b.getWinnerID() && b.getWinAmmount() > 0)
 			want = true;
@@ -267,10 +262,17 @@ public class OurPlayer implements Player {
 		if (ourID == b.getWinnerID()) {
 			currentRack.add(new RackLetter(b.getTargetLetter().getAlphabet(),
 					want));
-			amountBidOnRound += b.getWinAmmount();
-			l.trace("so far we have bid: " + amountBidOnRound);
 			setHighs();
 		}
+
+		// get bid info to add to the market value statistics
+		// int letterPlace = b.getTargetLetter().getAlphabet() - 'A'; // get
+		// letter place
+		// bidTimes[letterPlace]++; // got bid on
+		// bidSums[letterPlace]+= b.getWinAmmount(); // add to win amount
+
+		// to print the market values at the end of bidding.
+		// printMarketValues();
 	}
 
 	/** Reset high word and high score */
@@ -371,90 +373,92 @@ public class OurPlayer implements Player {
 		return (amt);
 	}
 
+	
 	/**
-	 * A simple function to return the number of letters left to bid on, i.e.
-	 * number of rounds left.
-	 * 
+	 * A simple function to return the number of letters left
+	 * to bid on, i.e. number of rounds left.
 	 * @return
 	 */
 	public int numRoundsLeft() {
-		// For each player, 8 letters are put in the bag.
-		// So to see how many letters we have left to bid on,
-		// AKA the number of rounds left, we subtract nOP*8 - nORP.
-		return (numberOfPlayers * 8) - numberOfRoundsPlayed;
-
+		// For each player, 8 letters are put in the bag. 
+		// So to see how many letters we have left to bid on, 
+		// AKA the number of rounds left, we subtract nOP*8 - nORP. 
+		return (numberOfPlayers*8) - numberOfRoundsPlayed;
 	}
-
+	
+	public boolean becomesSevenLetter(char c)
+	{	
+		// copy rack
+		Rack dummyRack = new Rack();
+		for(int i = 0; i < currentRack.size(); i++)
+			dummyRack.add(currentRack.get(i));
+		
+		// Adds new letter to rack
+		RackLetter l = new RackLetter(c, true);
+		dummyRack.add(l);
+		
+		String str = new String(dummyRack.getCharArray());
+		if(t.findWord(str))
+			return true;
+		else
+			return false;
+		
+	}
+	
+	
 	/**
 	 * Lets us know if it is possible to get a seven letter word with the
-	 * remaining letters.
+	 * remaining letters. 
 	 */
 	public boolean sevenLetterWordLeft() {
-
+				
 		if (sevenLetterWordLeft == false)
-			return (false);
-
+			return(false);
+		
 		boolean sevenLeft = true;
-
+		
 		// If the size our rack plus the number of rounds
 		// left don't even add up to seven, it's impossible
-		// to get a seven letter word.
+		// to get a seven letter word. 
 		//
 		// This is the most basic case.
-		if (this.numRoundsLeft() + currentRack.size() < 7)
+		if(this.numRoundsLeft() + currentRack.size() < 7)
 			sevenLeft = false;
-
-		// If we already have a seven letter word then return false so that we
-		// default to strategy where we only bid if we can get a higher scoring
-		// word
-		if (sevenLeft == true)
-			if (currentRack.size() >= 7) {
-				String[] args = new String[currentRack.size()];
-				for (int i = 0; i < currentRack.size(); i++) {
-					args[i] = Character.toString(currentRack.get(i).getL());
-				}
-				LetterSet i = (LetterSet) mine.getCachedItemSet(args);
-				if (null != i) {
-					sevenLeft = false;
-				}
-			}
-
-		// get seven letter words from apriori
-		// make sure letters left in bag
-		if (sevenLeft == true) {
-			String[] strarr = new String[currentRack.size()];
-			for (int i = 0; i < currentRack.size(); i++) {
-				strarr[i] = Character.toString(currentRack.get(i).getL());
-			}
-
-			String[] args = strarr;
-			LetterSet i = (LetterSet) mine.getCachedItemSet(args);
-
-			if (null != i) {
-				String[] words = i.getWords();
-				for (int j = 0; j < words.length; j++) {
-					char[] temp = words[j].toCharArray();
-					for (int k = 0; k < temp.length; k++) {
-						Boolean left = letterPossiblyLeft(temp[k]);
-						if (left == false) {
-							j++;
-						}// We could not make this word
-					}
-					j = words.length;
-				}
-			}
+		
+		//get seven letter words from apriori
+		//make sure letters left in bag
+		String[] strarr = new String[currentRack.size()];
+		for (int i = 0; i < currentRack.size(); i++) {
+			strarr[i] = Character.toString(currentRack.get(i).getL());
 		}
+
+		String[] args = strarr;
+		LetterSet i = (LetterSet) mine.getCachedItemSet(args);
+
+		if (null != i) {
+			String[] words = i.getWords();
+			for(int j = 0; j < words.length; j++){
+				char[] temp = words[j].toCharArray();
+				for(int k = 0; k < temp.length; k++){
+					Boolean left = letterPossiblyLeft(temp[k]);
+					if(left == false){
+						j++;
+					}//We could not make this word
+				}
+				j = words.length;
+			}
+		}	
 		sevenLeft = true;
 		sevenLetterWordLeft = sevenLeft;
 		return sevenLeft;
-
+		
 	}
 
 	/**
-	 * Returns whether it's even possible that a certain letter is still in the
-	 * bag to play on.
+	 * Returns whether it's even possible that a certain
+	 * letter is still in the bag to play on.
 	 * 
-	 * Depends on scrabble letter frequency.
+	 * Depends on scrabble letter frequency.  
 	 */
 	public boolean letterPossiblyLeft(char Letter) {
 
