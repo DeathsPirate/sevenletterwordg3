@@ -395,7 +395,7 @@ public class OurPlayer implements Player {
 		if (sevenLetterWordLeft == false)
 			return(false);
 		
-		boolean sevenLeft = false;
+		boolean sevenLeft = true;
 		
 		// If the size our rack plus the number of rounds
 		// left don't even add up to seven, it's impossible
@@ -405,29 +405,30 @@ public class OurPlayer implements Player {
 		if(this.numRoundsLeft() + currentRack.size() < 7)
 			sevenLeft = false;
 		
-		// copy current rack over, need a temp
-		Rack fakeRack = new Rack();
-		for(int i = 0; i < currentRack.size(); i++)
-			fakeRack.add(currentRack.get(i));
-		
-		// copy current bid times, need a temp
-		int[] fakeBidTimes = new int[bidTimes.length];
-		for(int i = 0; i < bidTimes.length; i++)
-			fakeBidTimes[i] = bidTimes[i];
-		
-		while(sevenLeft == false) {
-			while(fakeRack.size() < 7) {
-				for (char c = 'A'; c <= 'Z'; c++) {
-					while (this.letterPossiblyLeft(c)) {
-						fakeRack.add(new RackLetter(c, true));
-						fakeBidTimes[c - 'A']++;
-					}
-				}
-			}
-			if( t.findWord( new String(fakeRack.getCharArray()) ) == true) // TRUE
-				sevenLeft = true;
+		//get seven letter words from apriori
+		//make sure letters left in bag
+		String[] strarr = new String[currentRack.size()];
+		for (int i = 0; i < currentRack.size(); i++) {
+			strarr[i] = Character.toString(currentRack.get(i).getL());
 		}
-		
+
+		String[] args = strarr;
+		LetterSet i = (LetterSet) mine.getCachedItemSet(args);
+
+		if (null != i) {
+			String[] words = i.getWords();
+			for(int j = 0; j < words.length; j++){
+				char[] temp = words[j].toCharArray();
+				for(int k = 0; k < temp.length; k++){
+					Boolean left = letterPossiblyLeft(temp[k]);
+					if(left == false){
+						j++;
+					}//We could not make this word
+				}
+				j = words.length;
+			}
+		}	
+		sevenLeft = true;
 		sevenLetterWordLeft = sevenLeft;
 		return sevenLeft;
 		
