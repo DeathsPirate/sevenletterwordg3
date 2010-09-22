@@ -25,7 +25,6 @@ public class OurPlayer implements Player {
 	private String highWord = "";
 	private int highWordAmt = 0;
 	private static DataMine mine;
-	private Boolean sevenLetterWordLeft = true;
 	private History h;
 	private int amountBidOnRound = 0;
 	
@@ -74,6 +73,7 @@ public class OurPlayer implements Player {
 
 	/** When our player loads */
 	public void Register() {
+		l.trace("calling register");
 		combination_list_short = new ArrayList<String>();
 		combination_list_long = new ArrayList<String>();
 		h = new History();
@@ -117,8 +117,11 @@ public class OurPlayer implements Player {
 		// Adjusted Bid
 		int adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids,
 				ourID);
-		if(amountBidOnRound + adjustedBid > 56) //Make sure that we are not bidding too much
-			adjustedBid  = 56 - amountBidOnRound;
+		l.trace("So far bid: " + amountBidOnRound);
+		if(adjustedBid > 15){ //Make sure that we are not bidding too much
+			l.trace("Reduced bid!");
+			adjustedBid  = 15;
+		}
 		return adjustedBid;
 	}
 
@@ -268,6 +271,7 @@ public class OurPlayer implements Player {
 		if (ourID == b.getWinnerID()) {
 			currentRack.add(new RackLetter(b.getTargetLetter().getAlphabet(),
 					want));
+			amountBidOnRound += b.getWinAmmount();
 			setHighs();
 		}
 
@@ -284,6 +288,8 @@ public class OurPlayer implements Player {
 	/** Reset high word and high score */
 	public void setHighs() {
 
+		l.trace("In set highs");
+		
 		String temp = getHighWord();
 		if (temp != null) {
 			highWord = temp;
@@ -295,6 +301,8 @@ public class OurPlayer implements Player {
 	}
 
 	public String getHighWord() {
+		
+		l.trace("Looking for rack with: " + new String(currentRack.getCharArray()));
 
 		char[] rack = new char[currentRack.size()];
 		rack = currentRack.getCharArray();
@@ -318,8 +326,18 @@ public class OurPlayer implements Player {
 
 	/** Return our final word back to the simulator */
 	public String returnWord() {
-		setHighs();
-		return (highWord);
+		//setHighs();
+		highWord = getHighWord();
+		l.trace("Rack is: " + new String(currentRack.getCharArray()));
+		currentRack.clear();
+		l.trace("Returning: " + highWord);
+		String temp = highWord;
+		highWord = new String();
+		highWordAmt = 0;
+		amountBidOnRound = 0;
+		combination_list_long = new ArrayList<String>();
+		combination_list_short = new ArrayList<String>();
+		return (temp);
 	}
 
 	private String search(ArrayList<String> combination_list) {
@@ -418,8 +436,8 @@ public class OurPlayer implements Player {
 	 */
 	public boolean sevenLetterWordLeft() {
 				
-		if (sevenLetterWordLeft == false)
-			return(false);
+		/*if (sevenLetterWordLeft == false)
+			return(false);*/
 		
 		boolean sevenLeft = true;
 		
@@ -455,9 +473,7 @@ public class OurPlayer implements Player {
 			}
 		}	
 		sevenLeft = true;
-		sevenLetterWordLeft = sevenLeft;
-		return sevenLeft;
-		
+		return sevenLeft;		
 	}
 
 	/**

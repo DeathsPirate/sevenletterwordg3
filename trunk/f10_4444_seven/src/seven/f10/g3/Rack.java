@@ -93,6 +93,10 @@ public class Rack {
 			}
 		}
 	}
+	
+	public void clear(){
+		r = new ArrayList<RackLetter>();
+	}
 
 	private ArrayList<RackLetter> r;
 }
