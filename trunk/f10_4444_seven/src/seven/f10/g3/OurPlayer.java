@@ -168,8 +168,11 @@ public class OurPlayer implements Player {
 	 */
 	public void printMarketValues() {
 		for (int i = 0; i < 26; i++)
-			l.trace("Letter: " + ('A' + i) + ", Value: " + bidSums[i]
+		{
+			char temp = (char) ('A' + i);
+			l.trace("Letter: " + temp + ", Value: " + bidSums[i]
 					/ bidTimes[i]);
+		}
 	}
 
 	public int numberOfPossibilities(char[] arr) {
