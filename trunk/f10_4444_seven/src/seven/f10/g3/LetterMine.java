@@ -15,13 +15,9 @@ public class LetterMine extends DataMine {
                 public LetterSet(char c, Integer[] docids) {
                         super(new String[] { Character.toString(c)}, docids);
                 }
-                /* (non-Javadoc)
-                 * @see seven.g1.datamining.DataMine.ItemSetInt#intersect(seven.g1.datamining.DataMine.ItemSet, boolean)
-                 */
-                @Override
+               
                 public ItemSet intersect(ItemSet other_in, boolean finalRound) {
                         if (this == other_in) {
-                                logger.trace("In special intersection case");
                                 String items[] = getItems();
                                 int repeats = 1;
                                 String repeated = items[items.length - 1];
@@ -29,12 +25,7 @@ public class LetterMine extends DataMine {
                                 for (String item : items) {
                                         if (item.equals(repeated)) repeats++;
                                 }
-                                if (logger.isTraceEnabled()) {
-                                        logger.trace(String.format(
-                                                "Subsetting %s: looking for %d copies of %s",
-                                                new Object[]{ Arrays.deepToString(items), repeats, repeated }
-                                        ));
-                                }
+                              
                                 ArrayList<Integer> intersected = new ArrayList<Integer>();
                                 for (int wordID : transList) {
                                         String word = LetterMine.this.wordIndex[wordID];
