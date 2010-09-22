@@ -10,7 +10,7 @@ import seven.ui.PlayerBids;
 public class History {
 
 	private ArrayList<BidLog> bidLogList;
-	private double[] frequencyValue = {8, 2, 3, 4, 10, 1, 
+	private int[] frequencyValue = {8, 2, 3, 4, 10, 1, 
 		3, 3, 8, 0, 1, 5, 3, 6, 6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0};
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
@@ -18,7 +18,7 @@ public class History {
 
 	public History() {
 		bidLogList = new ArrayList<BidLog>();
-		frequencyValue = new double[26];
+		frequencyValue = new int[26];
 		marketValue = new ArrayList[26];
 		allBids = new ArrayList();
 	}
@@ -87,7 +87,7 @@ public class History {
 
 		}
 		
-		else return (int) (frequencyValue[(bidLetter.getValue() - 'A')]);
+		else return (frequencyValue[(bidLetter.getAlphabet() - 'A')]);
 		
 		return (int) (bid);
 	}
