@@ -3,6 +3,9 @@ package seven.f10.g3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
+
+import org.apache.log4j.Logger;
+
 import seven.ui.Letter;
 import seven.ui.PlayerBids;
 
@@ -13,6 +16,7 @@ public class History {
 			6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1 };
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
+	protected Logger l = Logger.getLogger(this.getClass());
 
 	public History() {
 		bidLogList = new ArrayList<BidLog>();
@@ -24,15 +28,16 @@ public class History {
 	public int adjust(String bidStrategy, Letter bidLetter,
 			ArrayList<PlayerBids> cachedBids, int ourID) {
 		double bid = 0;
-		// double overallAdjust = 0;
 		int bidLetterIndex = bidLetter.getAlphabet() - 'A';
-
+		
 		// round other than first round
 		if (cachedBids.size() != 0) {
+			l.trace("Not the first round!!!!!!");
 			int lastRound = cachedBids.size() - 1;
 			PlayerBids lastBids = cachedBids.get(lastRound);
 			int ourLastBid = lastBids.getBidvalues().get(ourID);
 			for(int i = 0; i < lastBids.getBidvalues().size(); i++){
+				l.trace("just added: " + lastBids.getBidvalues().get(i));
 				allBids.add(lastBids.getBidvalues().get(i));
 			}
 
