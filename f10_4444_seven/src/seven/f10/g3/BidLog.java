@@ -11,6 +11,7 @@ public class BidLog
 	private double median;
 	private double stdDev;
 	private double devMean;
+	private double radiusMean;
 	
 	public ArrayList<Double> getDiffMean()
 	{
@@ -68,5 +69,12 @@ public class BidLog
 	{
 		this.devMean=devMean;
 	}
-	
+	public double getRadiusMean()
+	{
+		return radiusMean;
+	}
+	public void setRadiusMean(double radiusMean)
+	{
+		this.radiusMean=radiusMean;
+	}
 }

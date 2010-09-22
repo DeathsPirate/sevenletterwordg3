@@ -104,15 +104,15 @@ public class OurPlayer implements Player {
 		}
 
 		// Generate Bids
-		String bid = "L";
+		String bidStrategy = "L";
 		if (sevenLetterWordLeft() == true)
-			bid = comparisonBid(bidLetter);
+			bidStrategy = comparisonBid(bidLetter);
 		else
-			bid = defaultBid(bidLetter);
+			bidStrategy = defaultBid(bidLetter);
 
-		//Adjustment bidding according to History
-		double adjustedBid = History.adjust(bid, cachedBids, ourID);
-		return (int) (adjustedBid);
+		// Adjusted Bid
+		int adjustedBid = History.adjust(bidStrategy, bidLetter, cachedBids, ourID);
+		return adjustedBid;
 	}
 
 	/**
