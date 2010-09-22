@@ -12,8 +12,8 @@ import seven.ui.PlayerBids;
 public class History {
 
 	private ArrayList<BidLog> bidLogList;
-	private double[] frequencyValue = { 9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2,
-			6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1 };
+	private double[] frequencyValue = {8, 2, 3, 4, 10, 1, 
+		3, 3, 8, 0, 1, 5, 3, 6, 6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0};
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
 	protected Logger l = Logger.getLogger(this.getClass());
