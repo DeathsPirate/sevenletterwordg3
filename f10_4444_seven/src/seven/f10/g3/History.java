@@ -58,9 +58,9 @@ public class History {
 			if (bidStrategy.equals("L")) {
 				strength = 0;
 			} else if (bidStrategy.equals("M")) {
-				strength = .5;
+				strength = .3;
 			} else if (bidStrategy.equals("H")) {
-				strength = .8;
+				strength = .65;
 			}
 
 			double overallAffect = .33;
