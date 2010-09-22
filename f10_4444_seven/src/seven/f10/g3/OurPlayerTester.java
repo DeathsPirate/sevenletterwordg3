@@ -14,12 +14,16 @@ public class OurPlayerTester{
 		OurPlayer p = new OurPlayer();
 		p.Register();
 		ArrayList<Letter> secretLetters = new ArrayList<Letter>();		
-		secretLetters.add(new Letter('I', 3));
+		secretLetters.add(new Letter('M', 3));
 		secretLetters.add(new Letter('V', 1));
-		
+		secretLetters.add(new Letter('E', 1));
+		secretLetters.add(new Letter('T', 1));
+		secretLetters.add(new Letter('U', 1));
+		secretLetters.add(new Letter('O', 1));
+
 		secretstate.setSecretLetters(secretLetters);
 		
-		char[] futureLetters = {'T', 'E', 'L', 'H', 'O', 'R'};
+		char[] futureLetters = {'E', 'T'};
 		
 		for(int i = 0; i < futureLetters.length; i++){
 			
@@ -34,7 +38,7 @@ public class OurPlayerTester{
 			p.setHighs();			
 		}
 		
-		p.setHighs();
+		System.out.println("Game over");
 	}	
 	static ArrayList<PlayerBids> PlayerBidList = new ArrayList<PlayerBids>();
 	static int total_rounds = 1;
