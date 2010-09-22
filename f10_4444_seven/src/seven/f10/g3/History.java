@@ -13,64 +13,88 @@ public class History
 {
 	private static ArrayList<BidLog> bidLogList=new ArrayList<BidLog>();
 	private static final Logger l=Logger.getLogger(History.class);
-	private static double meanAdjustSum=0;
-	private static double[] marketValue={9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 
+	private static double overallAdjustSum=0;
+	private static double[] frequencyValue={9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 
 		1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
+	private static ArrayList[] marketValue=new ArrayList[26];
 	
 	public static int adjust(String bidStrategy, Letter bidLetter,  
 		ArrayList<PlayerBids> cachedBids, int ourID)
 	{
-		double meanAdjust=0;
-		double bid=marketValue[bidLetter.getAlphabet()-'A'];
+		double bid=0;
+		double overallAdjust=0;
+		int bidLetterIndex=bidLetter.getAlphabet()-'A';
 		
 		// first round
-		if (cachedBids.size()==0)
-			return (int)(bid+0.5);
-		
-		int lastRound=cachedBids.size()-1;
-		PlayerBids lastBids=cachedBids.get(lastRound);
-		int ourLastBid=lastBids.getBidvalues().get(ourID);
-		
-		// mean adjust
-		double radiusMean=setRadiusMean(lastBids, ourID);
-		if (radiusMean!=-1)
-			meanAdjust=0.5*(radiusMean-ourLastBid);
-		
-		// store last letter market value
-		Letter lastLetter=lastBids.getTargetLetter();
-		int lastLetterIndex=lastLetter.getAlphabet()-'A';
-		if (radiusMean!=-1)
-			marketValue[lastLetterIndex]=0.6*radiusMean+0.4*marketValue[lastLetterIndex];
-		
-		// bid according to market value
-		bid=marketValue[bidLetter.getAlphabet()-'A']; 
-		
-		// strategy		
-		if (bidStrategy.equals("M"))
+		if (cachedBids.size()!=0)
 		{
-			meanAdjustSum+=meanAdjust;
-			bid+=meanAdjustSum;
-			l.error("bid M: meadAdjustSum="+meanAdjustSum);
+			int lastRound=cachedBids.size()-1;
+			PlayerBids lastBids=cachedBids.get(lastRound);
+			int ourLastBid=lastBids.getBidvalues().get(ourID);
+			
+			// overall adjust
+			double radiusMedian=setRadiusMedian(lastBids, ourID);
+			if (radiusMedian!=-1)
+				overallAdjust=0.5*(radiusMedian-ourLastBid);
+			
+			// store last letter market value
+			Letter lastLetter=lastBids.getTargetLetter();
+			int lastLetterIndex=lastLetter.getAlphabet()-'A';
+			
+			if (radiusMedian!=-1)
+			{
+				if (marketValue[lastLetterIndex]==null)
+					marketValue[lastLetterIndex]=new ArrayList<Integer>();
+				ListIterator<Integer> it=lastBids.getBidvalues().listIterator();
+				while (it.hasNext())
+					marketValue[lastLetterIndex].add(it.next());
+			}
 		}
-		else if (bidStrategy.equals("L"))
+		
+		// strategy
+		if (bidStrategy.equals("L"))
 		{
-			bid*=0.7;
+			bid=0;
 		}
+		else if (bidStrategy.equals("M"))
+		{
+			if (marketValue[bidLetterIndex]==null)
+				bid=frequencyValue[bidLetterIndex];
+			else
+			{
+				int index=(int)0.5*marketValue[bidLetterIndex].size();
+				Collections.sort(marketValue[bidLetterIndex]);
+				bid=(Integer)marketValue[bidLetterIndex].get(index);
+			}			
+			overallAdjustSum+=overallAdjust;
+			bid+=overallAdjustSum;
+			l.error("bid M: overallAdjustSum="+overallAdjustSum);
+		}		
 		else if (bidStrategy.equals("H"))
 		{
-			bid*=1.2;
+			if (marketValue[bidLetterIndex]==null)
+				bid=frequencyValue[bidLetterIndex];
+			else
+			{
+				int index=(int)0.9*marketValue[bidLetterIndex].size();
+				Collections.sort(marketValue[bidLetterIndex]);
+				bid=(Integer)marketValue[bidLetterIndex].get(index);
+			}
+			overallAdjustSum+=overallAdjust;
+			bid+=overallAdjustSum;
+			l.error("bid H: overallAdjustSum="+overallAdjustSum);
 		}
 		else if (bidStrategy.equals("7th"))
 		{
 			// Do not update meanAdjustSum
 			double riskRate=1.5;
 			bid=riskRate*(bidLetter.getValue()+50);
-			//TODO if > current money
+			//TODO if > current money <56
 		}
 		return (int)(bid+0.5);
 	}
 	
-	public static double setRadiusMean(PlayerBids lastBids, int ourID)
+	public static double setRadiusMedian(PlayerBids lastBids, int ourID)
 	{
 		int sum=0;
 		int top=0;
@@ -110,11 +134,11 @@ public class History
 		double devMean=getDevMean(bid.getBidvalues(), mean, stdDev, devRange);
 		bidLog.setDevMean(devMean);
 		*/
-		double radiusMean=getRadiusMean(lastBids.getBidvalues(), mean);
-		bidLog.setRadiusMean(radiusMean);
+		double radiusMedian=getRadiusMean(lastBids.getBidvalues(), median);
+		bidLog.setRadiusMedian(radiusMedian);
 		bidLogList.add(bidLog);
 		
-		return radiusMean;
+		return radiusMedian;
 	}
 	
 	public static double getMedian(ArrayList<Integer> arrayList)
