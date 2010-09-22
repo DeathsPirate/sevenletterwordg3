@@ -10,15 +10,14 @@ import seven.ui.PlayerBids;
 public class History {
 
 	private ArrayList<BidLog> bidLogList;
-	private int[] frequencyValue = {8, 2, 3, 4, 10, 1, 
-		3, 3, 8, 0, 1, 5, 3, 6, 6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0};
+	private int[] frequencyValue = { 8, 2, 3, 4, 10, 1, 3, 3, 8, 0, 1, 5, 3, 6,
+			6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0 };
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
 	protected Logger l = Logger.getLogger(this.getClass());
 
 	public History() {
 		bidLogList = new ArrayList<BidLog>();
-		frequencyValue = new int[26];
 		marketValue = new ArrayList[26];
 		allBids = new ArrayList();
 	}
@@ -30,21 +29,15 @@ public class History {
 		
 		// round other than first round
 		if (cachedBids.size() != 0) {
-			l.trace("Not the first round!!!!!!");
 			int lastRound = cachedBids.size() - 1;
 			PlayerBids lastBids = cachedBids.get(lastRound);
 			int ourLastBid = lastBids.getBidvalues().get(ourID);
-			for(int i = 0; i < lastBids.getBidvalues().size(); i++){
-				l.trace("just added: " + lastBids.getBidvalues().get(i));
+			for (int i = 0; i < lastBids.getBidvalues().size(); i++) {
 				allBids.add(lastBids.getBidvalues().get(i));
 			}
 
 			// overall adjust
 			double radiusMedian = setRadiusMedian(lastBids, ourID);
-			/*
-			 * if (radiusMedian!=-1)
-			 * overallAdjust=0.5*(radiusMedian-ourLastBid);
-			 */
 
 			// store last letter market value
 			Letter lastLetter = lastBids.getTargetLetter();
@@ -59,36 +52,46 @@ public class History {
 					marketValue[lastLetterIndex].add(it.next());
 			}
 
-		// strategy
-		double strength = 0;
-		if (bidStrategy.equals("L")) {
-			strength = 0;
-		} else if (bidStrategy.equals("M")) {
-			strength = .5;
+			// strategy
+			double strength = 0;
+			l.trace("Strategy is: " + bidStrategy);
+			if (bidStrategy.equals("L")) {
+				strength = 0;
+			} else if (bidStrategy.equals("M")) {
+				strength = .5;
+			} else if (bidStrategy.equals("H")) {
+				strength = .8;
+			}
 
-		} else if (bidStrategy.equals("H")) {
-			strength = .9;
+			double overallAffect = .33;
+			int indexm = -1;
+			double m = 0;
+			if (marketValue[bidLetterIndex] == null)
+				overallAffect = 1;
+			 else { 
+				 l.trace("We have a market history"); 
+				 indexm = (int) (Math.round(strength * marketValue[bidLetterIndex].size()));
+				 if(indexm == marketValue[bidLetterIndex].size())
+					 indexm--;
+				 Collections.sort(marketValue[bidLetterIndex]); 
+				 m = (1 - overallAffect) * (Integer)(marketValue[bidLetterIndex].get(indexm));
+			  }
+			 
+			int indexa = (int) (Math.round(strength * allBids.size()));
+			if(indexa == allBids.size())
+				indexa--;
+			l.trace("index a:" + indexa + " should be: " + (strength * allBids.size()));
+			Collections.sort(allBids);
+			l.trace("all bids: " + allBids.size());
+			bid = m + overallAffect * allBids.get(indexa);
 		}
 
-		double overallAffect = .33;
-		int indexm = -1;
-		double m = 0;
-		if (marketValue[bidLetterIndex] == null)
-			overallAffect = 1;
 		else {
-			indexm = (int) strength * marketValue[bidLetterIndex].size();
-			Collections.sort(marketValue[bidLetterIndex]);
-			m = (1 - overallAffect)
-					* (Integer) marketValue[bidLetterIndex].get(indexm);
+			l.trace("Returning: " + frequencyValue[(bidLetterIndex)]);
+			return (frequencyValue[(bidLetterIndex)]);
 		}
-		int indexa = (int) strength * allBids.size();
-		Collections.sort(allBids);
-		bid = m + overallAffect * (Integer) allBids.get(indexa);
 
-		}
-		
-		else return (frequencyValue[(bidLetter.getAlphabet() - 'A')]);
-		
+		l.trace("At end: " + bid);
 		return (int) (bid);
 	}
 
