@@ -3,9 +3,7 @@ package seven.f10.g3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
-
 import org.apache.log4j.Logger;
-
 import seven.ui.Letter;
 import seven.ui.PlayerBids;
 
@@ -89,7 +87,7 @@ public class History {
 
 		}
 		
-		else bid = 8;
+		else return (int) (frequencyValue[(bidLetter.getValue() - 'A')]);
 		
 		return (int) (bid);
 	}
