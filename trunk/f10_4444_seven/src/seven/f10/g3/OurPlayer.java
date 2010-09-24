@@ -120,8 +120,8 @@ public class OurPlayer implements Player {
 		}
 
 		//Never bid 0 in a two player round
-		if(cachedBids.get(0).getBidvalues().size() == 2 && adjustedBid == 0)
-			adjustedBid = 1;
+		//if(cachedBids.get(0).getBidvalues().size() == 2 && adjustedBid == 0)
+			//adjustedBid = 1;
 		
 		return adjustedBid;
 	}
