@@ -12,18 +12,34 @@ public class History {
 	private ArrayList<BidLog> bidLogList;
 	private int[] frequencyValue = { 8, 2, 3, 4, 10, 1, 3, 3, 8, 0, 1, 5, 3, 6,
 			6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0 };
+	private int[] letterCount={};
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
 	protected Logger l = Logger.getLogger(this.getClass());
 	private int[] bidTimes;
 	private int numberOfPlayers = 0, numHidden = 0, numberOfRoundsPlayed,
-			totalLettersInBag = 92;
+			totalLettersInBag = 98;
+	private double strengthArr[][];
+	private final int L=0;
+	private final int M=1;
+	private final int H=2;
 
 	public History() {
 		bidLogList = new ArrayList<BidLog>();
 		marketValue = new ArrayList[26];
 		allBids = new ArrayList();
 		bidTimes = new int[26];
+		
+		strengthArr=new double[13][3];
+		strengthArr[2][0]=.20; strengthArr[2][1]=.35; strengthArr[2][2]=.75;
+		strengthArr[3][0]=.10; strengthArr[3][1]=.30; strengthArr[3][2]=.65;
+		strengthArr[4][0]=.05; strengthArr[4][1]=.27; strengthArr[4][2]=.58;
+		for (int i=5; i<strengthArr.length; i++)
+		{
+			strengthArr[i][0]=0;
+			strengthArr[i][1]=0.25;
+			strengthArr[i][2]=0.55;
+		}
 	}
 
 	public int adjust(String bidStrategy, Letter bidLetter,
@@ -33,6 +49,9 @@ public class History {
 
 		// round other than first round
 		if (cachedBids.size() != 0) {
+			int np=cachedBids.get(0).getBidvalues().size();
+			boolean is2p=(np==2);
+			
 			PlayerBids lastBids = cachedBids.get(cachedBids.size() - 1);
 			for (int i = 0; i < lastBids.getBidvalues().size(); i++) {
 				allBids.add(lastBids.getBidvalues().get(i));
@@ -49,13 +68,12 @@ public class History {
 			// strategy
 			double strength = 0;
 			l.trace("Strategy is: " + bidStrategy);
-			if (bidStrategy.equals("L")) {
-				strength = 0;
-			} else if (bidStrategy.equals("M")) {
-				strength = .25;
-			} else if (bidStrategy.equals("H")) {
-				strength = .55;
-			}
+			if (bidStrategy.equals("L"))
+				strength=strengthArr[np][L];
+			else if (bidStrategy.equals("M"))
+				strength=strengthArr[np][M];
+			else if (bidStrategy.equals("H"))
+				strength=strengthArr[np][H];
 
 			double overallAffect = .33;
 			int indexm = -1;
@@ -83,6 +101,11 @@ public class History {
 			double adj2 = 1.5 - ((frequencyValue[bidLetterIndex] - 
 						bidTimes[bidLetterIndex])/frequencyValue[bidLetterIndex]);
 			bid = adj * adj2 * (m + o);
+			
+			// do not bid 0 in a 2-player game
+			bid+=0.5;
+			if (is2p && bid<1)
+				bid=1;
 		}
 
 		else { // Only used on the first round
