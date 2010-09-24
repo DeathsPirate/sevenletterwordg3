@@ -7,9 +7,9 @@ public class Bidder {
 	private static final String LOW = "LOW";
 	private static final String MID = "MID";
 	private static final String HIGH = "HIGH";
-	private static final float HIGH_BID = 1.5f;
-	private static final float MID_BID = 1.0f;
-	private static final float LOW_BID = 0.5f;
+	private static final float HIGH_BID = 0.90f;
+	private static final float MID_BID = 0.60f;
+	private static final float LOW_BID = 0.40f;
 	private static final int ASSUMED_WORD_SCORE = 60;
 	
 	private SevenLetterWordHelper sevenLetterWordHelper;
@@ -40,15 +40,22 @@ public class Bidder {
 		bidLevels.put(LOW, lowBids);
 	}
 	
-	public int getBidAmount(Character targetCharacter, int spentSoFar, int rackSize) {
-		return (int) (getBidBase(targetCharacter, spentSoFar, rackSize) * getBidMultiplier(targetCharacter));
+
+	public int getCompletingBid(int possiblePoints,int currentPoints) {
+		return possiblePoints - currentPoints ;
 	}
 	
-	private int getBidBase(Character targetCharacter, int spentSoFar, int rackSize) {
+	public int getBidAmount(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
+		int scoreToWin = (int) (getBidBase(gameStatus, targetCharacter, spentSoFar, rackSize) * getBidMultiplier(targetCharacter));
+		return scoreToWin;
+	}
+	
+	private int getBidBase(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
+		int remainingInBag = Math.max(1, gameStatus.getRemainingBag(targetCharacter));
+		int numTiles = 8 * gameStatus.getOpponentList().size();
 		if (rackSize < 7)
 			return (ASSUMED_WORD_SCORE - spentSoFar) / (7 - rackSize);
-		// if we already have 7-letter word, we can bid until we reach equity.
-		return Math.max(1, ASSUMED_WORD_SCORE - spentSoFar);
+		return (ASSUMED_WORD_SCORE - spentSoFar) / (2); // temp fix to make sure our bidding does not stop before getting a 7 letter word.
 	}
 
 	private float getBidMultiplier(Character targetCharacter) {
