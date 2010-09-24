@@ -466,4 +466,11 @@ public class OurPlayer implements Player {
 		System.out.println("Rack is now: "
 				+ new String(currentRack.getCharArray()));
 	}
+
+	@Override
+	public void updateScores(ArrayList<Integer> scores)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

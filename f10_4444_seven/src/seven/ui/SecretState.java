@@ -40,11 +40,6 @@ public class SecretState {
 	public int getTotalLetters() {
 		return total_letters;
 	}
-	
-	public void setSecretLetters(ArrayList<Letter> s){
-		
-		secretLetters = s;
-	}
 
     
 }
