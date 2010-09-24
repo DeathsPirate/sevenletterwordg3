@@ -11,8 +11,9 @@ public class History {
 
 	private ArrayList<BidLog> bidLogList;
 	private int[] frequencyValue = { 8, 2, 3, 4, 10, 1, 3, 3, 8, 0, 1, 5, 3, 6,
-			6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0 };
-	private int[] letterCount={};
+		6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0 };
+	private int[] letterCount={9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 
+		1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
 	protected Logger l = Logger.getLogger(this.getClass());
@@ -65,6 +66,9 @@ public class History {
 			while (it.hasNext())
 				marketValue[lastLetterIndex].add(it.next());
 
+			// update bidTimes
+			bidTimes[lastLetterIndex]++;
+			
 			// strategy
 			double strength = 0;
 			l.trace("Strategy is: " + bidStrategy);
@@ -98,8 +102,8 @@ public class History {
 			// account for the number of letters left in the bag
 			double adj = 2 - totalLettersSeen() / totalLettersInBag;
 			//account for number of letters left of this letter
-			double adj2 = 1.5 - ((frequencyValue[bidLetterIndex] - 
-						bidTimes[bidLetterIndex])/frequencyValue[bidLetterIndex]);
+			double adj2 = 1.5 - ((letterCount[bidLetterIndex] - 
+						bidTimes[bidLetterIndex])/letterCount[bidLetterIndex]);
 			bid = adj * adj2 * (m + o);
 			
 			// do not bid 0 in a 2-player game
@@ -124,7 +128,7 @@ public class History {
 	 */
 	public boolean letterPossiblyLeft(char Letter) {
 
-		if (bidTimes[Letter - 'A'] == frequencyValue[Letter - 'A'])
+		if (bidTimes[Letter - 'A'] == letterCount[Letter - 'A'])
 			return false;
 		else
 			return true;
