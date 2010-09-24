@@ -15,54 +15,48 @@ public class History {
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
 	protected Logger l = Logger.getLogger(this.getClass());
+	private int[] bidTimes;
+	private int numberOfPlayers = 0, numHidden = 0, numberOfRoundsPlayed,
+			totalLettersInBag = 92;
 
 	public History() {
 		bidLogList = new ArrayList<BidLog>();
 		marketValue = new ArrayList[26];
 		allBids = new ArrayList();
+		bidTimes = new int[26];
 	}
 
 	public int adjust(String bidStrategy, Letter bidLetter,
 			ArrayList<PlayerBids> cachedBids, int ourID) {
 		double bid = 0;
 		int bidLetterIndex = bidLetter.getAlphabet() - 'A';
-		
+
 		// round other than first round
 		if (cachedBids.size() != 0) {
-			int lastRound = cachedBids.size() - 1;
-			PlayerBids lastBids = cachedBids.get(lastRound);
-			int ourLastBid = lastBids.getBidvalues().get(ourID);
+			PlayerBids lastBids = cachedBids.get(cachedBids.size() - 1);
 			for (int i = 0; i < lastBids.getBidvalues().size(); i++) {
 				allBids.add(lastBids.getBidvalues().get(i));
 			}
-
-			// overall adjust
-			double radiusMedian = setRadiusMedian(lastBids, ourID);
-
-			// store last letter market value
 			Letter lastLetter = lastBids.getTargetLetter();
 			int lastLetterIndex = lastLetter.getAlphabet() - 'A';
 
-			if (radiusMedian != -1) {
-				if (marketValue[lastLetterIndex] == null)
-					marketValue[lastLetterIndex] = new ArrayList<Integer>();
-				ListIterator<Integer> it = lastBids.getBidvalues()
-						.listIterator();
-				while (it.hasNext())
-					marketValue[lastLetterIndex].add(it.next());
-			}
+			if (marketValue[lastLetterIndex] == null)
+				marketValue[lastLetterIndex] = new ArrayList<Integer>();
+			ListIterator<Integer> it = lastBids.getBidvalues().listIterator();
+			while (it.hasNext())
+				marketValue[lastLetterIndex].add(it.next());
 
 			// strategy
 			double strength = 0;
 			l.trace("Strategy is: " + bidStrategy);
 			if (bidStrategy.equals("L")) {
 				strength = 0;
-				if(cachedBids.size() == 2)//we have a two player game
+				if (cachedBids.size() == 2)// we have a two player game
 					strength = .2; // don't bid zero in a two player game
 			} else if (bidStrategy.equals("M")) {
-				strength = .3;
+				strength = .25;
 			} else if (bidStrategy.equals("H")) {
-				strength = .65;
+				strength = .55;
 			}
 
 			double overallAffect = .33;
@@ -70,26 +64,30 @@ public class History {
 			double m = 0;
 			if (marketValue[bidLetterIndex] == null)
 				overallAffect = 1;
-			 else { 
-				 l.trace("We have a market history"); 
-				 indexm = (int) (Math.round(strength * marketValue[bidLetterIndex].size()));
-				 if(indexm == marketValue[bidLetterIndex].size())
-					 indexm--;
-				 Collections.sort(marketValue[bidLetterIndex]); 
-				 m = (1 - overallAffect) * (Integer)(marketValue[bidLetterIndex].get(indexm));
-			  }
-			 
+			else {
+				indexm = (int) (Math.round(strength * marketValue[bidLetterIndex].size()));
+				if (indexm == marketValue[bidLetterIndex].size())
+					indexm--;
+				Collections.sort(marketValue[bidLetterIndex]);
+				m = (1 - overallAffect)
+						* (Integer) (marketValue[bidLetterIndex].get(indexm));
+			}
+
 			int indexa = (int) (Math.round(strength * allBids.size()));
-			if(indexa == allBids.size())
+			if (indexa == allBids.size())
 				indexa--;
-			l.trace("index a:" + indexa + " should be: " + (strength * allBids.size()));
 			Collections.sort(allBids);
-			l.trace("all bids: " + allBids.size());
-			bid = m + overallAffect * allBids.get(indexa);
+			double o = overallAffect * allBids.get(indexa);
+
+			// account for the number of letters left in the bag
+			double adj = 2 - totalLettersSeen() / totalLettersInBag;
+			//account for number of letters left of this letter
+			double adj2 = 1.5 - ((frequencyValue[bidLetterIndex] - 
+						bidTimes[bidLetterIndex])/frequencyValue[bidLetterIndex]);
+			bid = adj * adj2 * (m + o);
 		}
 
-		else {
-			l.trace("Returning: " + frequencyValue[bidLetterIndex]);
+		else { // Only used on the first round
 			return (frequencyValue[bidLetterIndex]);
 		}
 
@@ -97,95 +95,57 @@ public class History {
 		return (int) (bid);
 	}
 
-	public double setRadiusMedian(PlayerBids lastBids, int ourID) {
-		int sum = 0;
-		int top = 0;
-		ListIterator<Integer> it = lastBids.getBidvalues().listIterator();
-		while (it.hasNext()) {
-			int temp = it.next();
-			if (temp > top)
-				top = temp;
-			sum += temp;
-		}
-		double mean = 1.000 * sum / lastBids.getBidvalues().size();
-		double median = getMedian(lastBids.getBidvalues());
+	/**
+	 * Returns whether it's even possible that a certain letter is still in the
+	 * bag to play on.
+	 * 
+	 * Depends on scrabble letter frequency.
+	 */
+	public boolean letterPossiblyLeft(char Letter) {
 
-		// store parameters in BidLog
-		BidLog bidLog = new BidLog();
-		bidLog.setMean(mean);
-		bidLog.setMedian(median);
-		bidLog.setSum(sum);
-		bidLog.setTop(top);
-
-		// diffMean and Standard Deviation
-		/*
-		 * ArrayList<Double> diffMean=new ArrayList<Double>();
-		 * bidLog.setDiffMean(diffMean); it=bid.getBidvalues().listIterator();
-		 * double diff=0; double diffSum=0; while (it.hasNext()) {
-		 * diff=it.next()-mean; diffMean.add(diff); diffSum+=diff*diff; } double
-		 * stdDev=Math.sqrt((diffSum/(diffMean.size()-1)));
-		 * bidLog.setStdDev(stdDev); double
-		 * devMean=getDevMean(bid.getBidvalues(), mean, stdDev, devRange);
-		 * bidLog.setDevMean(devMean);
-		 */
-		double radiusMedian = getRadiusMean(lastBids.getBidvalues(), median);
-		bidLog.setRadiusMedian(radiusMedian);
-		bidLogList.add(bidLog);
-
-		return radiusMedian;
-	}
-
-	public double getMedian(ArrayList<Integer> arrayList) {
-		ArrayList<Integer> list = (ArrayList<Integer>) arrayList.clone();
-		Collections.sort(list);
-		int len = list.size();
-		if (len % 2 == 0)
-			return (list.get(len / 2) + list.get(len / 2 - 1)) * 1.000 / 2;
+		if (bidTimes[Letter - 'A'] == frequencyValue[Letter - 'A'])
+			return false;
 		else
-			return list.get(len / 2);
+			return true;
 	}
 
-	public double getDevMean(ArrayList<Integer> arrayList, double mean,
-			double stdDev, double range) {
-		double min = mean - stdDev * range;
-		double max = mean + stdDev * range;
-		ListIterator<Integer> it = arrayList.listIterator();
-		double sum = 0;
-		double count = 0;
-		double val = 0;
-		while (it.hasNext()) {
-			val = it.next();
-			if (val >= min && val <= max) {
-				sum += val;
-				count++;
-			}
-		}
-		if (count == 0)
-			return -1;
-		return 1.000 * sum / count;
+	/** Getter method for bid times */
+	public int getBidTimes(int letterPlace) {
+		return bidTimes[letterPlace];
 	}
 
-	public int getRadius(double mean) {
-		return (int) (Math.sqrt(mean) + 0.5);
+	/**
+	 * A simple function to return the number of letters left to bid on, i.e.
+	 * number of rounds left. For each player, 8 letters are put in the bag.
+	 * 
+	 * @return number left
+	 */
+	public int numTilesLeftToBid() {
+		return (numberOfPlayers * (8 - numHidden)) - numberOfRoundsPlayed;
 	}
 
-	public double getRadiusMean(ArrayList<Integer> arrayList, double mean) {
-		int radius = getRadius(mean);
-		double min = mean - radius;
-		double max = mean + radius;
-		ListIterator<Integer> it = arrayList.listIterator();
-		double sum = 0;
-		double count = 0;
-		double val = 0;
-		while (it.hasNext()) {
-			val = it.next();
-			if (val >= min && val <= max) {
-				sum += val;
-				count++;
-			}
-		}
-		if (count == 0)
-			return -1;
-		return 1.000 * sum / count;
+	public void setNumberOfRoundsPlayed(int i) {
+		numberOfRoundsPlayed = i;
+	}
+	
+	public int getNumberOfRoundsPlayed() {
+		return numberOfRoundsPlayed;
+	}
+
+	/** Return total number of letters that will be seen in this game */
+	public int totalLettersSeen() {
+		return (numberOfPlayers * 8);
+	}
+
+	public int getNumHidden() {
+		return numHidden;
+	}
+
+	public void setNumHidden(int numHidden) {
+		this.numHidden = numHidden;
+	}
+
+	public void setNumberOfPlayers(int size) {
+		numberOfPlayers = size;
 	}
 }
