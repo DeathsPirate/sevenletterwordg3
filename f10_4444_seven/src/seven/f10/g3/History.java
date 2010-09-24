@@ -51,8 +51,6 @@ public class History {
 			l.trace("Strategy is: " + bidStrategy);
 			if (bidStrategy.equals("L")) {
 				strength = 0;
-				if (cachedBids.size() == 2)// we have a two player game
-					strength = .2; // don't bid zero in a two player game
 			} else if (bidStrategy.equals("M")) {
 				strength = .25;
 			} else if (bidStrategy.equals("H")) {
