@@ -10,20 +10,16 @@ public class OurPlayerTester{
 	public static void main(String args[]){
 		
 		System.out.println("Testing OurPlayer....");
-		//BEZIQUE
 		OurPlayer p = new OurPlayer();
 		p.Register();
 		ArrayList<Letter> secretLetters = new ArrayList<Letter>();		
-		secretLetters.add(new Letter('M', 3));
-		secretLetters.add(new Letter('V', 1));
+		secretLetters.add(new Letter('N', 3));
 		secretLetters.add(new Letter('E', 1));
-		secretLetters.add(new Letter('T', 1));
-		secretLetters.add(new Letter('U', 1));
-		secretLetters.add(new Letter('O', 1));
+		secretLetters.add(new Letter('N', 1));
 
 		secretstate.setSecretLetters(secretLetters);
 		
-		char[] futureLetters = {'E', 'T'};
+		char[] futureLetters = {'E', 'B', 'E', 'A', 'F', 'R', 'S'};
 		
 		for(int i = 0; i < futureLetters.length; i++){
 			

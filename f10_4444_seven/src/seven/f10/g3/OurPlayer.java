@@ -28,13 +28,7 @@ public class OurPlayer implements Player {
 	private History h;
 	private int amountBidOnRound = 0;
 
-	// To keep track of rounds played and number of
-	// players we're playing against.
-	int numberOfRoundsPlayed;
-	int numberOfPlayers = 0;
-
 	// For use to keep track of market value of letters
-	private int[] bidTimes = new int[26];
 	private int[] bidSums = new int[26];
 
 	// Letter Frequency Array, as given by Scrabble rules
@@ -80,15 +74,11 @@ public class OurPlayer implements Player {
 
 		// Instantiate the market value arrays
 		for (int i = 0; i < 26; i++) {
-			bidTimes[i] = 0;
 			bidSums[i] = 0;
 		}
 
 		// Keep count of how many rounds we've played.
-		// There seems to be no way to get the number
-		// people we're playing against so this is
-		// kind of a hack, and messy.
-		numberOfRoundsPlayed = 0;
+		h.setNumberOfRoundsPlayed(0);
 	}
 
 	/** Player Bids */
@@ -118,7 +108,7 @@ public class OurPlayer implements Player {
 		int adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids, ourID);
 
 		// Adjust bid to make sure that it is not extravagant - getting no
-		// leters but ending up wiht a score of 100 is better than spending all
+		// letters but ending up wiht a score of 100 is better than spending all
 		// of our points
 		if (currentRack.size() < 7) {
 			if (adjustedBid > (56 - amountBidOnRound)
@@ -129,6 +119,10 @@ public class OurPlayer implements Player {
 			}
 		}
 
+		//Never bid 0 in a two player round
+		if(cachedBids.get(0).getBidvalues().size() == 2 && adjustedBid == 0)
+			adjustedBid = 1;
+		
 		return adjustedBid;
 	}
 
@@ -150,7 +144,7 @@ public class OurPlayer implements Player {
 		int[] sortedAmounts = new int[26];
 
 		for (char c = 'A'; c <= 'Z'; c++) {
-			if (letterPossiblyLeft(c)) {
+			if (h.letterPossiblyLeft(c)) {
 				rack[rack.length - 1] = c;
 				int pos = numberOfPossibilities(rack);
 				sortedAmounts[c - 65] = pos;
@@ -176,7 +170,7 @@ public class OurPlayer implements Player {
 	 */
 	public int marketValue(char Letter) {
 		int letterPlace = Letter - 'A';
-		return bidSums[letterPlace] / bidTimes[letterPlace]; // return winning
+		return bidSums[letterPlace] / h.getBidTimes(letterPlace); // return winning
 	}
 
 	/**
@@ -186,7 +180,7 @@ public class OurPlayer implements Player {
 	public void printMarketValues() {
 		for (int i = 0; i < 26; i++) {
 			char temp = (char) ('A' + i);
-			l.trace("Letter: " + temp + ", Value: " + bidSums[i] / bidTimes[i]);
+			l.trace("Letter: " + temp + ", Value: " + bidSums[i] / h.getBidTimes(i));
 		}
 	}
 
@@ -252,6 +246,7 @@ public class OurPlayer implements Player {
 		ourID = PlayerID;
 		for (Letter l : secretstate.getSecretLetters()) {
 			currentRack.add(new RackLetter(l.getAlphabet()));
+			h.setNumHidden(h.getNumHidden() + 1);
 		}
 		setHighs();
 
@@ -259,12 +254,12 @@ public class OurPlayer implements Player {
 
 	/** Check to see if we win the bid, if so add it to your rack */
 	private void checkBid(PlayerBids b) {
-		numberOfRoundsPlayed++; // We've played a round
+		h.setNumberOfRoundsPlayed(h.getNumberOfRoundsPlayed() +1); // We've played a round
 
 		// This will run every time we play, and its value
 		// should not change.
 		// It's bad design but it works.
-		numberOfPlayers = b.getBidvalues().size();
+		h.setNumberOfPlayers(b.getBidvalues().size());
 
 		if (ourID == b.getWinnerID()) {
 			currentRack.add(new RackLetter(b.getTargetLetter().getAlphabet()));
@@ -329,12 +324,17 @@ public class OurPlayer implements Player {
 		currentRack.clear();
 		l.trace("Returning: " + highWord);
 		String temp = highWord;
+		return (temp);
+	}
+	
+	/**Called at end of rack to reset our hand*/
+	private void resetRack(){
 		highWord = new String();
 		highWordAmt = 0;
 		amountBidOnRound = 0;
 		combination_list_long = new ArrayList<String>();
 		combination_list_short = new ArrayList<String>();
-		return (temp);
+		h.setNumHidden(0);
 	}
 
 	private String search(ArrayList<String> combination_list) {
@@ -394,19 +394,6 @@ public class OurPlayer implements Player {
 		return (amt);
 	}
 
-	/**
-	 * A simple function to return the number of letters left to bid on, i.e.
-	 * number of rounds left.
-	 * 
-	 * @return
-	 */
-	public int numRoundsLeft() {
-		// For each player, 8 letters are put in the bag.
-		// So to see how many letters we have left to bid on,
-		// AKA the number of rounds left, we subtract nOP*8 - nORP.
-		return (numberOfPlayers * 8) - numberOfRoundsPlayed;
-	}
-
 	public boolean becomesSevenLetter(char c) {
 		// copy rack
 		Rack dummyRack = new Rack();
@@ -442,7 +429,7 @@ public class OurPlayer implements Player {
 		// to get a seven letter word.
 		//
 		// This is the most basic case.
-		if (this.numRoundsLeft() + currentRack.size() < 7)
+		if (h.numTilesLeftToBid() + currentRack.size() < 7)
 			sevenLeft = false;
 
 		// get seven letter words from apriori
@@ -460,7 +447,7 @@ public class OurPlayer implements Player {
 			for (int j = 0; j < words.length; j++) {
 				char[] temp = words[j].toCharArray();
 				for (int k = 0; k < temp.length; k++) {
-					Boolean left = letterPossiblyLeft(temp[k]);
+					Boolean left = h.letterPossiblyLeft(temp[k]);
 					if (left == false) {
 						j++;
 					}// We could not make this word
@@ -472,19 +459,6 @@ public class OurPlayer implements Player {
 		return sevenLeft;
 	}
 
-	/**
-	 * Returns whether it's even possible that a certain letter is still in the
-	 * bag to play on.
-	 * 
-	 * Depends on scrabble letter frequency.
-	 */
-	public boolean letterPossiblyLeft(char Letter) {
-
-		if (bidTimes[Letter - 'A'] == letterFrequency[Letter - 'A'])
-			return false;
-		else
-			return true;
-	}
 
 	/** Method only for debugging - artiicially adds to rack */
 	public void addToRack(char c) {
