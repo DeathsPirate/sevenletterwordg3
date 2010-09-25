@@ -21,6 +21,7 @@ public class OurPlayer implements Player {
 	static private TrieTree<String> t;
 	private ArrayList<String> combination_list_short;
 	private ArrayList<String> combination_list_long;
+	private ArrayList<String> combination_list_seven;
 	protected Logger l = Logger.getLogger(this.getClass());
 	private String highWord = "";
 	private int highWordAmt = 0;
@@ -67,7 +68,6 @@ public class OurPlayer implements Player {
 
 	/** When our player loads */
 	public void Register() {
-		l.trace("calling register");
 		combination_list_short = new ArrayList<String>();
 		combination_list_long = new ArrayList<String>();
 		h = new History();
@@ -99,7 +99,9 @@ public class OurPlayer implements Player {
 
 		// Generate Bids
 		String bidStrategy = "L";
-		if (sevenLetterWordLeft() == true)
+		if(currentRack.size() >= 7 && haveSevenLetterWord() == true)
+			bidStrategy = defaultBid(bidLetter);
+		else if (sevenLetterWordLeft() == true)
 			bidStrategy = comparisonBid(bidLetter);
 		else
 			bidStrategy = defaultBid(bidLetter);
@@ -111,18 +113,13 @@ public class OurPlayer implements Player {
 		// letters but ending up wiht a score of 100 is better than spending all
 		// of our points
 		if (currentRack.size() < 7) {
-			if (adjustedBid > (56 - amountBidOnRound)
+			if (adjustedBid > (50 - amountBidOnRound)
 					/ (7 - currentRack.size())) {
-				l.trace("Adjusted bid from: " + adjustedBid);
-				adjustedBid = (56 - amountBidOnRound)
+				adjustedBid = (50 - amountBidOnRound)
 						/ (7 - currentRack.size());
 			}
 		}
 
-		//Never bid 0 in a two player round
-		//if(cachedBids.get(0).getBidvalues().size() == 2 && adjustedBid == 0)
-			//adjustedBid = 1;
-		
 		return adjustedBid;
 	}
 
@@ -153,12 +150,16 @@ public class OurPlayer implements Player {
 				}
 			}
 		}
-
-		// Determine high, medium, or low bid
 		Arrays.sort(sortedAmounts);
-		if (b > sortedAmounts[5])
+		// Determine high, medium, or low bid
+		String r = "";
+		for(int i = 0; i < sortedAmounts.length; i++)
+			r += sortedAmounts[i] + " ";
+		l.warn(r);
+		l.warn("bid: " + b);
+		if (b > sortedAmounts[21])
 			return ("H");
-		else if (b > sortedAmounts[10])
+		else if (b > sortedAmounts[11])
 			return ("M");
 		else
 			return ("L");
@@ -170,7 +171,8 @@ public class OurPlayer implements Player {
 	 */
 	public int marketValue(char Letter) {
 		int letterPlace = Letter - 'A';
-		return bidSums[letterPlace] / h.getBidTimes(letterPlace); // return winning
+		return bidSums[letterPlace] / h.getBidTimes(letterPlace); // return
+																	// winning
 	}
 
 	/**
@@ -180,7 +182,8 @@ public class OurPlayer implements Player {
 	public void printMarketValues() {
 		for (int i = 0; i < 26; i++) {
 			char temp = (char) ('A' + i);
-			l.trace("Letter: " + temp + ", Value: " + bidSums[i] / h.getBidTimes(i));
+			l.warn("Letter: " + temp + ", Value: " + bidSums[i]
+					/ h.getBidTimes(i));
 		}
 	}
 
@@ -254,11 +257,8 @@ public class OurPlayer implements Player {
 
 	/** Check to see if we win the bid, if so add it to your rack */
 	private void checkBid(PlayerBids b) {
-		h.setNumberOfRoundsPlayed(h.getNumberOfRoundsPlayed() +1); // We've played a round
-
-		// This will run every time we play, and its value
-		// should not change.
-		// It's bad design but it works.
+		
+		h.setNumberOfRoundsPlayed(h.getNumberOfRoundsPlayed() + 1); 
 		h.setNumberOfPlayers(b.getBidvalues().size());
 
 		if (ourID == b.getWinnerID()) {
@@ -266,35 +266,19 @@ public class OurPlayer implements Player {
 			amountBidOnRound += b.getWinAmmount();
 			setHighs();
 		}
-
-		// get bid info to add to the market value statistics
-		// int letterPlace = b.getTargetLetter().getAlphabet() - 'A'; // get
-		// letter place
-		// bidTimes[letterPlace]++; // got bid on
-		// bidSums[letterPlace]+= b.getWinAmmount(); // add to win amount
-
-		// to print the market values at the end of bidding.
-		// printMarketValues();
 	}
 
 	/** Reset high word and high score */
 	public void setHighs() {
-
-		l.trace("In set highs");
-
+		
 		String temp = getHighWord();
 		if (temp != null) {
 			highWord = temp;
 			highWordAmt = getWordAmount(highWord);
-			System.out.println("Just set highs to: " + highWord + ", "
-					+ highWordAmt);
 		}
 	}
 
 	public String getHighWord() {
-
-		l.trace("Looking for rack with: "
-				+ new String(currentRack.getCharArray()));
 
 		char[] rack = new char[currentRack.size()];
 		rack = currentRack.getCharArray();
@@ -320,15 +304,16 @@ public class OurPlayer implements Player {
 	public String returnWord() {
 		// setHighs();
 		highWord = getHighWord();
-		l.trace("Rack is: " + new String(currentRack.getCharArray()));
+		l.warn("Rack is: " + new String(currentRack.getCharArray()));
 		currentRack.clear();
-		l.trace("Returning: " + highWord);
+		l.warn("Returning: " + highWord);
 		String temp = highWord;
+		resetRack();
 		return (temp);
 	}
-	
-	/**Called at end of rack to reset our hand*/
-	private void resetRack(){
+
+	/** Called at end of rack to reset our hand */
+	private void resetRack() {
 		highWord = new String();
 		highWordAmt = 0;
 		amountBidOnRound = 0;
@@ -369,18 +354,6 @@ public class OurPlayer implements Player {
 		}
 	}
 
-	/*
-	 * private ArrayList<String> sort_by_length(ArrayList<String> old_list) {
-	 * 
-	 * l.trace("here"); int i = 0; int j = 0; Boolean keepgoing = true; while
-	 * (keepgoing == true) { keepgoing = false; for (i = 0; i < old_list.size();
-	 * i++) { for (j = 0; j < old_list.size(); j++) { if
-	 * (old_list.get(i).length() < old_list.get(j).length()) {
-	 * l.trace("before: " + old_list.get(i)); Collections.swap(old_list, i, j);
-	 * l.trace("after: " + old_list.get(i)+ "\n"); keepgoing = true; } } } i =
-	 * 0; } l.trace("returning"); return old_list; }
-	 */
-
 	public int getWordAmount(String word) {
 
 		char[] c = word.toCharArray();
@@ -417,48 +390,39 @@ public class OurPlayer implements Player {
 	 * remaining letters.
 	 */
 	public boolean sevenLetterWordLeft() {
-
-		/*
-		 * if (sevenLetterWordLeft == false) return(false);
-		 */
-
-		boolean sevenLeft = true;
+		
+		boolean sevenLeft = false;
 
 		// If the size our rack plus the number of rounds
 		// left don't even add up to seven, it's impossible
 		// to get a seven letter word.
-		//
-		// This is the most basic case.
-		if (h.numTilesLeftToBid() + currentRack.size() < 7)
-			sevenLeft = false;
+		if (h.numTilesLeftToBid() + currentRack.size() > 7){
+			//Convert to string array for apriori
+			String[] strarr = new String[currentRack.size()];
+			for (int i = 0; i < currentRack.size(); i++) {
+				strarr[i] = Character.toString(currentRack.get(i).getL());
+			}
 
-		// get seven letter words from apriori
-		// make sure letters left in bag
-		String[] strarr = new String[currentRack.size()];
-		for (int i = 0; i < currentRack.size(); i++) {
-			strarr[i] = Character.toString(currentRack.get(i).getL());
-		}
+			String[] args = strarr;
+			LetterSet i = (LetterSet) mine.getCachedItemSet(args);
 
-		String[] args = strarr;
-		LetterSet i = (LetterSet) mine.getCachedItemSet(args);
-
-		if (null != i) {
-			String[] words = i.getWords();
-			for (int j = 0; j < words.length; j++) {
-				char[] temp = words[j].toCharArray();
-				for (int k = 0; k < temp.length; k++) {
-					Boolean left = h.letterPossiblyLeft(temp[k]);
-					if (left == false) {
-						j++;
-					}// We could not make this word
+			if (null != i) {
+				String[] words = i.getWords();
+				for (int j = 0; j < words.length; j++) {
+					char[] temp = words[j].toCharArray();
+					for (int k = 0; k < temp.length; k++) {
+						Boolean left = h.letterPossiblyLeft(temp[k]);
+						if (left == false) {
+							j++;
+						}// We could not make this word
+					}//We made a word
+					j = words.length;
+					sevenLeft = true;
 				}
-				j = words.length;
 			}
 		}
-		sevenLeft = true;
 		return sevenLeft;
 	}
-
 
 	/** Method only for debugging - artiicially adds to rack */
 	public void addToRack(char c) {
@@ -466,10 +430,33 @@ public class OurPlayer implements Player {
 		System.out.println("Rack is now: "
 				+ new String(currentRack.getCharArray()));
 	}
+	
+	/**Whether or not we have a seven letter word left*/
+	public boolean haveSevenLetterWord(){
+		combination_list_seven = new ArrayList();
+		longCombinations("", new String(currentRack.getCharArray()));
+		for(int i = 0; i < combination_list_seven.size(); i++){
+			int ret = numberOfPossibilities(combination_list_seven.get(i).toCharArray());
+			l.warn(combination_list_seven.get(i) + ", " + ret);
+			if(ret >= 1)
+				return true;
+		}
+			return false;
+	}
+	
+	private void longCombinations(String prefix, String s) {
+		if (s.length() > 0) {
+			String str = prefix + s.charAt(0);
+			if (str.length() == 7) {
+				combination_list_seven.add(str);
+			}
+			longCombinations(prefix + s.charAt(0), s.substring(1));
+			longCombinations(prefix, s.substring(1));
+		}
+	}
 
 	@Override
-	public void updateScores(ArrayList<Integer> scores)
-	{
+	public void updateScores(ArrayList<Integer> scores) {
 		// TODO Auto-generated method stub
 		
 	}

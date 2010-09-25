@@ -1,5 +1,8 @@
 package seven.f10.g3;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
@@ -10,37 +13,26 @@ import seven.ui.PlayerBids;
 public class History {
 
 	private ArrayList<BidLog> bidLogList;
-	private int[] frequencyValue = { 8, 2, 3, 4, 10, 1, 3, 3, 8, 0, 1, 5, 3, 6,
-		6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0 };
-	private int[] letterCount={9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 
-		1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
+	private final int[] associatedValue = { 8, 2, 3, 4, 10, 1, 3, 3, 8, 0, 1,
+			5, 3, 6, 6, 3, 0, 7, 8, 5, 4, 1, 1, 0, 2, 0 };
+	private int[] totalLetters = { 9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6,
+			8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1 };
 	private ArrayList[] marketValue;
 	private ArrayList<Integer> allBids;
 	protected Logger l = Logger.getLogger(this.getClass());
-	private int[] bidTimes;
+	private int[] lettersLeft;
 	private int numberOfPlayers = 0, numHidden = 0, numberOfRoundsPlayed,
 			totalLettersInBag = 98;
 	private double strengthArr[][];
-	private final int L=0;
-	private final int M=1;
-	private final int H=2;
+	private final double L = 0;
+	private final double M = .25;
+	private final double H = .65;
 
 	public History() {
 		bidLogList = new ArrayList<BidLog>();
 		marketValue = new ArrayList[26];
 		allBids = new ArrayList();
-		bidTimes = new int[26];
-		
-		strengthArr=new double[13][3];
-		strengthArr[2][0]=.20; strengthArr[2][1]=.35; strengthArr[2][2]=.75;
-		strengthArr[3][0]=.10; strengthArr[3][1]=.30; strengthArr[3][2]=.65;
-		strengthArr[4][0]=.05; strengthArr[4][1]=.27; strengthArr[4][2]=.58;
-		for (int i=5; i<strengthArr.length; i++)
-		{
-			strengthArr[i][0]=0;
-			strengthArr[i][1]=0.25;
-			strengthArr[i][2]=0.55;
-		}
+		lettersLeft = new int[26];
 	}
 
 	public int adjust(String bidStrategy, Letter bidLetter,
@@ -50,9 +42,6 @@ public class History {
 
 		// round other than first round
 		if (cachedBids.size() != 0) {
-			int np=cachedBids.get(0).getBidvalues().size();
-			boolean is2p=(np==2);
-			
 			PlayerBids lastBids = cachedBids.get(cachedBids.size() - 1);
 			for (int i = 0; i < lastBids.getBidvalues().size(); i++) {
 				allBids.add(lastBids.getBidvalues().get(i));
@@ -67,17 +56,16 @@ public class History {
 				marketValue[lastLetterIndex].add(it.next());
 
 			// update bidTimes
-			bidTimes[lastLetterIndex]++;
-			
+			lettersLeft[lastLetterIndex]++;
+
 			// strategy
 			double strength = 0;
-			l.trace("Strategy is: " + bidStrategy);
 			if (bidStrategy.equals("L"))
-				strength=strengthArr[np][L];
+				strength = L;
 			else if (bidStrategy.equals("M"))
-				strength=strengthArr[np][M];
+				strength = M;
 			else if (bidStrategy.equals("H"))
-				strength=strengthArr[np][H];
+				strength = H;
 
 			double overallAffect = .33;
 			int indexm = -1;
@@ -85,7 +73,8 @@ public class History {
 			if (marketValue[bidLetterIndex] == null)
 				overallAffect = 1;
 			else {
-				indexm = (int) (Math.round(strength * marketValue[bidLetterIndex].size()));
+				indexm = (int) (Math.round(strength
+						* marketValue[bidLetterIndex].size()));
 				if (indexm == marketValue[bidLetterIndex].size())
 					indexm--;
 				Collections.sort(marketValue[bidLetterIndex]);
@@ -101,23 +90,30 @@ public class History {
 
 			// account for the number of letters left in the bag
 			double adj = 2 - totalLettersSeen() / totalLettersInBag;
-			//account for number of letters left of this letter
-			double adj2 = 1.5 - ((letterCount[bidLetterIndex] - 
-						bidTimes[bidLetterIndex])/letterCount[bidLetterIndex]);
-			bid = adj * adj2 * (m + o);
+			// account for number of letters left of this letter
+			double adj2 = 1.5 - ((totalLetters[bidLetterIndex] - lettersLeft[bidLetterIndex]) / totalLetters[bidLetterIndex]);
+			bid = (m + o); // add the .5 to account for rounding when we cast to int
+			if(bidStrategy == "H")
+				bid = bid * adj * adj2;
+			l.warn(adj + ", " + adj2 + ", " + m + ", " + o);
+			/*l.warn("adj: " + adj);
+			l.warn("adj2: " + adj2);*/
 			
-			// do not bid 0 in a 2-player game
-			bid+=0.5;
-			if (is2p && bid<1)
-				bid=1;
+			// Never bid 0 in a two player round
+			if (cachedBids.get(0).getBidvalues().size() == 2) {
+				l.warn("Since its a two player game we are adjusting our bid");
+				if(bidStrategy == "L")//make sure that statistics are not skewed
+					bid = .25 * bid;
+				if(bid == 0)
+					bid = 1;
+			}
+			l.warn("Strategy is: " + bidStrategy + " and bid is: " + bid + " on letter: " + bidLetter.getAlphabet());
+			return (int) (bid);
 		}
 
 		else { // Only used on the first round
-			return (frequencyValue[bidLetterIndex]);
+			return (associatedValue[bidLetterIndex]);
 		}
-
-		l.trace("At end: " + bid);
-		return (int) (bid);
 	}
 
 	/**
@@ -128,7 +124,7 @@ public class History {
 	 */
 	public boolean letterPossiblyLeft(char Letter) {
 
-		if (bidTimes[Letter - 'A'] == letterCount[Letter - 'A'])
+		if (lettersLeft[Letter - 'A'] == totalLetters[Letter - 'A'])
 			return false;
 		else
 			return true;
@@ -136,7 +132,7 @@ public class History {
 
 	/** Getter method for bid times */
 	public int getBidTimes(int letterPlace) {
-		return bidTimes[letterPlace];
+		return lettersLeft[letterPlace];
 	}
 
 	/**
@@ -152,7 +148,7 @@ public class History {
 	public void setNumberOfRoundsPlayed(int i) {
 		numberOfRoundsPlayed = i;
 	}
-	
+
 	public int getNumberOfRoundsPlayed() {
 		return numberOfRoundsPlayed;
 	}
