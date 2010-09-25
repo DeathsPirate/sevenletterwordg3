@@ -28,11 +28,6 @@ public class SecretState {
 	public ArrayList<Letter> getSecretLetters() {
 		return secretLetters;
 	}
-	
-	public void setSecretLetters(ArrayList<Letter> secretLetters)
-	{
-		this.secretLetters=secretLetters;
-	}
 	/**
 	 * @return the score
 	 */
@@ -45,6 +40,11 @@ public class SecretState {
 	public int getTotalLetters() {
 		return total_letters;
 	}
+	
+	public void setSecretLetters(ArrayList<Letter> s){
+        
+        secretLetters = s;
+}
 
     
 }

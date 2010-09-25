@@ -23,7 +23,7 @@ public class LessStingyPlayer implements Player {
 		String line = null;
 		ArrayList<Word> wtmp = new ArrayList<Word>(55000);
 		try {
-			r = new BufferedReader(new FileReader("src/seven/g1/super-small-wordlist.txt"));
+			r = new BufferedReader(new FileReader("src/seven/f10/g3/smallwordlist.txt"));
 			while (null != (line = r.readLine())) {
 				wtmp.add(new Word(line.trim()));
 			}
