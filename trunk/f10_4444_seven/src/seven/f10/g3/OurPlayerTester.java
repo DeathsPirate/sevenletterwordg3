@@ -12,14 +12,15 @@ public class OurPlayerTester{
 		System.out.println("Testing OurPlayer....");
 		OurPlayer p = new OurPlayer();
 		p.Register();
-		ArrayList<Letter> secretLetters = new ArrayList<Letter>();		
-		secretLetters.add(new Letter('N', 3));
-		secretLetters.add(new Letter('E', 1));
-		secretLetters.add(new Letter('N', 1));
+		ArrayList<Letter> secretLetters = new ArrayList<Letter>();
+		//AAAAEEEIKNOPTV
+		secretLetters.add(new Letter('A', 3));
+		secretLetters.add(new Letter('A', 1));
+		secretLetters.add(new Letter('A', 1));
 
 		secretstate.setSecretLetters(secretLetters);
 		
-		char[] futureLetters = {'E', 'B', 'E', 'A', 'F', 'R', 'S'};
+		char[] futureLetters = {'A', 'E', 'E', 'E', 'I', 'K', 'N', 'O', 'P', 'T', 'V'};
 		
 		for(int i = 0; i < futureLetters.length; i++){
 			
