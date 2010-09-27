@@ -271,7 +271,6 @@ public class OurPlayer implements Player
 		if (node!=null&&node.isWord()==true)
 		{
 			bid=hbid;
-
 		}
 		else
 		{
@@ -344,9 +343,13 @@ public class OurPlayer implements Player
 
 	public String getHighWord()
 	{
-
 		char[] rack=new char[currentRack.size()];
 		rack=currentRack.getCharArray();
+		
+		l.warn("getHighWord(): size="+currentRack.size());
+		for (int i=0; i<rack.length; i++)
+			l.warn(rack[i]);
+		
 		Arrays.sort(rack);
 
 		// Look in trie for words
@@ -370,6 +373,7 @@ public class OurPlayer implements Player
 	/** Return our final word back to the simulator */
 	public String returnWord()
 	{
+		checkBid(cachedBids.get(cachedBids.size()-1));
 		// setHighs();
 		highWord=getHighWord();
 		l.warn("Rack is: "+new String(currentRack.getCharArray()));
@@ -390,6 +394,7 @@ public class OurPlayer implements Player
 		combination_list_short=new ArrayList<String>();
 		h.setNumHidden(0);
 		h.setNumberOfRoundsPlayed(0);
+		currentRack=null;
 	}
 
 	private String search(ArrayList<String> combination_list)
