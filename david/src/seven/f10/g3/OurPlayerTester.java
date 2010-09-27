@@ -14,13 +14,17 @@ public class OurPlayerTester{
 		p.Register();
 		ArrayList<Letter> secretLetters = new ArrayList<Letter>();
 		//AAAAEEEIKNOPTV
-		secretLetters.add(new Letter('A', 3));
+		secretLetters.add(new Letter('N', 3));
+		secretLetters.add(new Letter('P', 1));
 		secretLetters.add(new Letter('A', 1));
+		secretLetters.add(new Letter('L', 1));
 		secretLetters.add(new Letter('A', 1));
+		secretLetters.add(new Letter('Z', 1));
+		secretLetters.add(new Letter('M', 1));
 
 		secretstate.setSecretLetters(secretLetters);
 		
-		char[] futureLetters = {'A', 'E', 'E', 'E', 'I', 'K', 'N', 'O', 'P', 'T', 'V'};
+		char[] futureLetters = {'I', 'A', 'Z'};
 		
 		for(int i = 0; i < futureLetters.length; i++){
 			
