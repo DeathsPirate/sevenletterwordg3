@@ -1,0 +1,30 @@
+#!/bin/bash
+# A shell script to print each number five times.
+n=0
+k=1
+players=( 
+seven.f10.g1.players.NaivePlayer
+seven.f10.g3.OurPlayer
+seven.f10.g4.G4Player
+seven.f10.g5.Ninja
+seven.f10.g6.InitialPlayer
+seven.f10.g7.ClassyPlayer
+seven.f10.g9.BiddingPlayer
+seven.g1.G1Player
+)
+for((h = 0; h <=7; h++))
+do
+for (( i = 0; i < 8; i++ ))      ### Player 1 ###
+do
+ 
+    for (( j = $i ; j < 8; j++ )) ### Player 2 ###
+    do
+          if [ $i -ne $j ]
+          then
+          java -Xmx1000M -cp bin:bin/seven/g2/log4j-1.2.15.jar seven.ui.GameEngine "${players[$i]} ${players[$j]}" $h 1 8C2-2player_tourney.txt
+          n=$(($n+$k))
+          fi
+done
+done
+done
+echo "played $n rounds"
