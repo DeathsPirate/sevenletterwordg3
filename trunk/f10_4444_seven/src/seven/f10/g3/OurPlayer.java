@@ -470,12 +470,13 @@ public class OurPlayer implements Player {
 		l.warn("In have seven letter word with: " + new String(currentRack.getCharArray()));
 		combos.clear();
 		combinations("", new String(currentRack.getCharArray()), 6);
-		for (int i = 0; i < combos.size(); i++) {
-			if(combos.get(i).length() == 7){
-			l.warn("combo: " + combos.get(i));
-			l.warn("combo: " + combos.get(i).toCharArray());
-			int ret = numberOfPossibilities(combos.get(i).toCharArray());
-			l.warn("combos.get/ret" + combos.get(i) + ", " + ret);
+		ArrayList<String> tempcombos = new ArrayList<String>(combos);
+		for (int i = 0; i < tempcombos.size(); i++) {
+			if(tempcombos.get(i).length() == 7){
+			l.warn("combo: " + tempcombos.get(i));
+			l.warn("combo: " + new String(tempcombos.get(i).toCharArray()));
+			int ret = numberOfPossibilities(tempcombos.get(i).toCharArray());
+			l.warn("combos.get/ret" + tempcombos.get(i) + ", " + ret);
 			if (ret >= 1)
 				return true;
 		}
