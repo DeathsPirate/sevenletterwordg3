@@ -28,7 +28,7 @@ public class History
 	private double strengthArr[][];
 	private final double L=0;
 	private final double M=.25;
-	private final double H=.65;
+	private final double H=0.7;
 	private final double lStrategy=1.000*10/26;
 	private final double hStrategy=1.000*21/26;	
 
@@ -106,7 +106,7 @@ public class History
 			 */
 
 			// Never bid 0 in a two player round
-			if (np==2)
+			if (np<=4)
 			{
 				//l.warn("Since its a two player game we are adjusting our bid");
 				if (bidStrategy<lStrategy)// make sure that statistics are not skewed
