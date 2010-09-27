@@ -475,7 +475,7 @@ public class OurPlayer implements Player {
 			if(tempcombos.get(i).length() == 7){
 			l.warn("combo: " + tempcombos.get(i));
 			l.warn("combo: " + new String(tempcombos.get(i).toCharArray()));
-			int ret = numberOfPossibilities(tempcombos.get(i).toCharArray());
+			int ret = useApriori(tempcombos.get(i).toCharArray());
 			l.warn("combos.get/ret" + tempcombos.get(i) + ", " + ret);
 			if (ret >= 1)
 				return true;
