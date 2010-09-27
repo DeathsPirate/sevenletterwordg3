@@ -100,22 +100,22 @@ public class History
 			if (bidStrategy>hStrategy)
 				// bid = bid * adj * adj2;
 				bid=bid*adj;
-			l.warn(adj+", "+adj2+", "+m+", "+o);
+			//l.warn(adj+", "+adj2+", "+m+", "+o);
 			/*
-			 * l.warn("adj: " + adj); l.warn("adj2: " + adj2);
+			 * //l.warn("adj: " + adj); //l.warn("adj2: " + adj2);
 			 */
 
 			// Never bid 0 in a two player round
 			if (np==2)
 			{
-				l.warn("Since its a two player game we are adjusting our bid");
+				//l.warn("Since its a two player game we are adjusting our bid");
 				if (bidStrategy<lStrategy)// make sure that statistics are not skewed
 					bid=.8*bid;
 				if (bid<1)
 					bid=1;
 			}
-			l.warn("Strategy is: "+bidStrategy+" and bid is: "+bid
-				+" on letter: "+bidLetter.getAlphabet());
+			/*l.warn("Strategy is: "+bidStrategy+" and bid is: "+bid
+				+" on letter: "+bidLetter.getAlphabet());*/
 		}
 		else
 		{ // Only used on the first round
