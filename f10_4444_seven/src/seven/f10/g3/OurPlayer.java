@@ -152,8 +152,8 @@ public class OurPlayer implements Player {
 		String r = "";
 		for (int i = 0; i < sortedAmounts.length; i++)
 			r += sortedAmounts[i] + " ";
-		l.warn("stred: " + r);
-		l.warn("bid: " + b);
+		/*l.warn("stred: " + r);
+		l.warn("bid: " + b);*/
 
 		if (b == 0)
 			return 0;
@@ -174,8 +174,8 @@ public class OurPlayer implements Player {
 		double bidValue = 1.000 * (1 + indexb - firstNonZero)
 				/ (sortedAmounts.length - firstNonZero);
 
-		l.warn("firstNonZero=" + firstNonZero + " indexb=" + indexb
-				+ " bidValue=" + bidValue);
+		/*l.warn("firstNonZero=" + firstNonZero + " indexb=" + indexb
+				+ " bidValue=" + bidValue);*/
 		return bidValue;
 	}
 
@@ -207,10 +207,8 @@ public class OurPlayer implements Player {
 		if (arr.length <= 5)
 			count = useApriori(arr);
 		else {// subdivide array
-			System.out.println("else!");
 			combos.clear();
 			combinations("", new String(arr), 4);
-			l.warn("Size: " + combos.size());
 			for (int i = 0; i < combos.size(); i++) {
 				count += useApriori(combos.get(i).toCharArray());
 			}
@@ -312,29 +310,26 @@ public class OurPlayer implements Player {
 		}
 	}
 
-	public String getHighWord()
-	{
-		char[] rack=new char[currentRack.size()];
-		rack=currentRack.getCharArray();
-		
-		l.warn("getHighWord(): size="+currentRack.size());
-		for (int i=0; i<rack.length; i++)
-			l.warn(rack[i]);
-		
+	public String getHighWord() {
+		char[] rack = new char[currentRack.size()];
+		rack = currentRack.getCharArray();
+
+		l.trace("getHighWord(): size=" + currentRack.size());
+		for (int i = 0; i < rack.length; i++)
+			l.trace(rack[i]);
+
 		Arrays.sort(rack);
 
 		// Look in trie for words
-		String temp=new String(rack);
+		String temp = new String(rack);
 		combinations("", temp, 0);
-		if (rack.length>0)
-		{
-			String str=search(combos);
-			if (str.length()>0)
+		if (rack.length > 0) {
+			String str = search(combos);
+			if (str.length() > 0)
 				return (str.toUpperCase());
-			else
-			{
-				str=search(combos);
-				if (str.length()>0)
+			else {
+				str = search(combos);
+				if (str.length() > 0)
 					return (str.toUpperCase());
 			}
 		}
@@ -342,29 +337,27 @@ public class OurPlayer implements Player {
 	}
 
 	/** Return our final word back to the simulator */
-public String returnWord()
-	{
-		checkBid(cachedBids.get(cachedBids.size()-1));
+	public String returnWord() {
+		checkBid(cachedBids.get(cachedBids.size() - 1));
 		// setHighs();
-		highWord=getHighWord();
-		l.warn("Rack is: "+new String(currentRack.getCharArray()));
+		highWord = getHighWord();
+		l.trace("Rack is: " + new String(currentRack.getCharArray()));
 		currentRack.clear();
-		l.warn("Returning: "+highWord);
-		String temp=highWord;
+		l.trace("Returning: " + highWord);
+		String temp = highWord;
 		resetRack();
 		return (temp);
 	}
 
 	/** Called at end of rack to reset our hand */
-		private void resetRack()
-	{
-		highWord=new String();
-		highWordAmt=0;
-		amountBidOnRound=0;
-		combos=new ArrayList<String>();
+	private void resetRack() {
+		highWord = new String();
+		highWordAmt = 0;
+		amountBidOnRound = 0;
+		combos = new ArrayList<String>();
 		h.setNumHidden(0);
 		h.setNumberOfRoundsPlayed(0);
-		currentRack=null;
+		currentRack = null;
 	}
 
 	private String search(ArrayList<String> combination_list) {
@@ -389,7 +382,7 @@ public String returnWord()
 		if (s.length() > 0) {
 			String str = prefix + s.charAt(0);
 			if (str.length() > min)
-					combos.add(str);
+				combos.add(str);
 			combinations(prefix + s.charAt(0), s.substring(1), min);
 			combinations(prefix, s.substring(1), min);
 		}
@@ -474,13 +467,19 @@ public String returnWord()
 
 	/** Whether or not we have a seven letter word left */
 	public boolean haveSevenLetterWord() {
-		/*
-		 * combos.clear(); combinations("", new
-		 * String(currentRack.getCharArray()), 0, false); for (int i = 0; i <
-		 * combos.size(); i++) { int ret = numberOfPossibilities(combos.get(i)
-		 * .toCharArray()); l.warn("combos.get/ret" + combos.get(i) + ", " +
-		 * ret); if (ret >= 1) return true; }
-		 */
+		l.warn("In have seven letter word with: " + new String(currentRack.getCharArray()));
+		combos.clear();
+		combinations("", new String(currentRack.getCharArray()), 6);
+		for (int i = 0; i < combos.size(); i++) {
+			if(combos.get(i).length() == 7){
+			l.warn("combo: " + combos.get(i));
+			l.warn("combo: " + combos.get(i).toCharArray());
+			int ret = numberOfPossibilities(combos.get(i).toCharArray());
+			l.warn("combos.get/ret" + combos.get(i) + ", " + ret);
+			if (ret >= 1)
+				return true;
+		}
+		}
 		return false;
 	}
 
