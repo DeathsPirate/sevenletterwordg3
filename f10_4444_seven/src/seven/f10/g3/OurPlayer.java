@@ -24,7 +24,6 @@ public class OurPlayer implements Player {
 	private int highWordAmt = 0;
 	private static DataMine mine;
 	private History h;
-	private int amountBidOnRound = 0;
 	private ArrayList<String> combos;
 
 	// For use to keep track of market value of letters
@@ -95,7 +94,11 @@ public class OurPlayer implements Player {
 
 		// Generate Bids
 		double bidStrategy;
-		if (currentRack.size() >= 7 && haveSevenLetterWord() == true)
+		if (cachedBids.size() == 0 && currentRack.size() == 0)// First round and
+			// no hidden
+			// letters
+			bidStrategy = -1;
+		else if (currentRack.size() >= 7 && haveSevenLetterWord() == true)
 			bidStrategy = defaultBid(bidLetter);
 		else if (sevenLetterWordLeft() == true)
 			bidStrategy = comparisonBid(bidLetter);
@@ -105,18 +108,40 @@ public class OurPlayer implements Player {
 		// Adjusted Bid
 		int adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids, ourID);
 
-		// Adjust bid to make sure that it is not extravagant - getting no
-		// letters but ending up wiht a score of 100 is better than spending all
-		// of our points
-		int maxbid = 61;
-		if (currentRack.size() < 7) {
-			if (adjustedBid > 1.0 * (maxbid - amountBidOnRound)
-					/ (7 - currentRack.size())) {
-				adjustedBid = (maxbid - amountBidOnRound)
-						/ (7 - currentRack.size());
+		// Reduce if it is too high
+		int maxbid = 49;
+		boolean becomesSeven = becomesSevenLetter(bidLetter.getAlphabet());
+		boolean becomesSix = almostBecomesSevenLetter(bidLetter.getAlphabet());
+		boolean haveSeven = haveSevenLetterWord();
+		if (becomesSeven == false) {
+			l.warn("already bid: " + h.getAmountBidOnRound());
+			if (currentRack.size() - h.getNumHidden() != 0)
+				l.warn("already averaged: " + h.getAmountBidOnRound()
+						/ (currentRack.size() - h.getNumHidden()));
+			int denom = 7;
+			if (denom == currentRack.size())
+				denom += 2;
+			if (maxbid <= h.getAmountBidOnRound())
+				maxbid += Math.abs(maxbid - h.getAmountBidOnRound()) + 5;
+			l.warn("comp is: " + (maxbid - h.getAmountBidOnRound())
+					/ (denom - currentRack.size()));
+				l.warn("maxbid: " + maxbid);
+			if (adjustedBid > (maxbid - h.getAmountBidOnRound())
+					/ (denom - currentRack.size())) {
+				adjustedBid = (maxbid - h.getAmountBidOnRound())
+						/ (denom - currentRack.size());
 			}
+		} else if (haveSeven == false && becomesSeven == true) {
+			l.warn("makes a 7 letter word?");
+			adjustedBid *= 1.5;
+		} else if (haveSeven == false && becomesSix == true) {
+			l.warn("1 away from 7");
+			adjustedBid *= 1.3;
+		} else {
+			l.warn("Should be a low bid, we have seven letters");
 		}
 
+		l.warn("\n\n");
 		return adjustedBid;
 	}
 
@@ -152,8 +177,9 @@ public class OurPlayer implements Player {
 		String r = "";
 		for (int i = 0; i < sortedAmounts.length; i++)
 			r += sortedAmounts[i] + " ";
-		/*l.warn("stred: " + r);
-		l.warn("bid: " + b);*/
+		/*
+		 * l.warn("stred: " + r); l.warn("bid: " + b);
+		 */
 
 		if (b == 0)
 			return 0;
@@ -174,8 +200,10 @@ public class OurPlayer implements Player {
 		double bidValue = 1.000 * (1 + indexb - firstNonZero)
 				/ (sortedAmounts.length - firstNonZero);
 
-		/*l.warn("firstNonZero=" + firstNonZero + " indexb=" + indexb
-				+ " bidValue=" + bidValue);*/
+		/*
+		 * l.warn("firstNonZero=" + firstNonZero + " indexb=" + indexb +
+		 * " bidValue=" + bidValue);
+		 */
 		return bidValue;
 	}
 
@@ -289,12 +317,12 @@ public class OurPlayer implements Player {
 	/** Check to see if we win the bid, if so add it to your rack */
 	private void checkBid(PlayerBids b) {
 
-		h.setNumberOfRoundsPlayed(h.getNumberOfRoundsPlayed() + 1);
+		h.setNumBidRoundsPlayed(h.getNumBidRoundsPlayed() + 1);
 		h.setNumberOfPlayers(b.getBidvalues().size());
 
 		if (ourID == b.getWinnerID()) {
 			currentRack.add(new RackLetter(b.getTargetLetter().getAlphabet()));
-			amountBidOnRound += b.getWinAmmount();
+			h.setAmountBidOnRound(h.getAmountBidOnRound() + b.getWinAmmount());
 			setHighs();
 		}
 	}
@@ -353,10 +381,10 @@ public class OurPlayer implements Player {
 	private void resetRack() {
 		highWord = new String();
 		highWordAmt = 0;
-		amountBidOnRound = 0;
+		h.setAmountBidOnRound(0);
 		combos = new ArrayList<String>();
 		h.setNumHidden(0);
-		h.setNumberOfRoundsPlayed(0);
+		h.setNumBidRoundsPlayed(0);
 		currentRack = null;
 	}
 
@@ -402,6 +430,10 @@ public class OurPlayer implements Player {
 	}
 
 	public boolean becomesSevenLetter(char c) {
+
+		if (currentRack.size() < 6)
+			return false;
+
 		// copy rack
 		Rack dummyRack = new Rack();
 		for (int i = 0; i < currentRack.size(); i++)
@@ -411,12 +443,48 @@ public class OurPlayer implements Player {
 		RackLetter l = new RackLetter(c);
 		dummyRack.add(l);
 
-		String str = new String(dummyRack.getCharArray());
-		if (t.findWord(str))
-			return true;
-		else
+		System.err.println("In have seven letter word with: "
+				+ new String(dummyRack.getCharArray()));
+		combos.clear();
+		combinations("", new String(dummyRack.getCharArray()), 6);
+		ArrayList<String> tempcombos = new ArrayList<String>(combos);
+		for (int i = 0; i < tempcombos.size(); i++) {
+			if (tempcombos.get(i).length() == 7) {
+				int ret = useApriori(tempcombos.get(i).toCharArray());
+				if (ret >= 1){
+					System.err.println("can make: " + tempcombos.get(i));
+					return true;}
+			}
+		}
+		return false;
+
+	}
+
+	public boolean almostBecomesSevenLetter(char c) {
+
+		if (currentRack.size() < 5)
 			return false;
 
+		// copy rack
+		for (char n = 'A'; n <= 'Z'; n++) {
+			
+			Rack dummyRack = new Rack();
+			for (int i = 0; i < currentRack.size(); i++)
+				dummyRack.add(currentRack.get(i));
+			dummyRack.add(new RackLetter(c));
+			dummyRack.add(new RackLetter(n));
+			combos.clear();
+			combinations("", new String(dummyRack.getCharArray()), 6);
+			ArrayList<String> tempcombos = new ArrayList<String>(combos);
+			for (int i = 0; i < tempcombos.size(); i++) {
+				if (tempcombos.get(i).length() == 7) {
+					int ret = useApriori(tempcombos.get(i).toCharArray());
+					if (ret >= 1)
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -467,19 +535,17 @@ public class OurPlayer implements Player {
 
 	/** Whether or not we have a seven letter word left */
 	public boolean haveSevenLetterWord() {
-		l.warn("In have seven letter word with: " + new String(currentRack.getCharArray()));
+		l.warn("In have seven letter word with: "
+				+ new String(currentRack.getCharArray()));
 		combos.clear();
 		combinations("", new String(currentRack.getCharArray()), 6);
 		ArrayList<String> tempcombos = new ArrayList<String>(combos);
 		for (int i = 0; i < tempcombos.size(); i++) {
-			if(tempcombos.get(i).length() == 7){
-			l.warn("combo: " + tempcombos.get(i));
-			l.warn("combo: " + new String(tempcombos.get(i).toCharArray()));
-			int ret = useApriori(tempcombos.get(i).toCharArray());
-			l.warn("combos.get/ret" + tempcombos.get(i) + ", " + ret);
-			if (ret >= 1)
-				return true;
-		}
+			if (tempcombos.get(i).length() == 7) {
+				int ret = useApriori(tempcombos.get(i).toCharArray());
+				if (ret >= 1)
+					return true;
+			}
 		}
 		return false;
 	}
