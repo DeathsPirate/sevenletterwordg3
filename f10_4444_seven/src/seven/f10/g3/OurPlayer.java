@@ -177,10 +177,7 @@ public class OurPlayer implements Player {
 		String r = "";
 		for (int i = 0; i < sortedAmounts.length; i++)
 			r += sortedAmounts[i] + " ";
-		/*
-		 * l.warn("stred: " + r); l.warn("bid: " + b);
-		 */
-
+		
 		if (b == 0)
 			return 0;
 
@@ -192,18 +189,18 @@ public class OurPlayer implements Player {
 				break;
 		}
 
-		int indexb = firstNonZero;
+		double indexb = firstNonZero;
 		for (; indexb < sortedAmounts.length; indexb++)
-			if (sortedAmounts[indexb] == b)
+			if (sortedAmounts[(int)indexb] == b)
 				break;
 
-		double bidValue = 1.000 * (1 + indexb - firstNonZero)
+		l.warn("b is: " + b);
+		l.warn("max is: " + sortedAmounts[(sortedAmounts.length-1)]);
+		l.warn("index b is: " + indexb + ", firstnonzero: " + firstNonZero);
+		double bidValue = (1 + indexb - firstNonZero)
 				/ (sortedAmounts.length - firstNonZero);
 
-		/*
-		 * l.warn("firstNonZero=" + firstNonZero + " indexb=" + indexb +
-		 * " bidValue=" + bidValue);
-		 */
+		l.warn("Comparison bid is returning: " + bidValue);
 		return bidValue;
 	}
 
