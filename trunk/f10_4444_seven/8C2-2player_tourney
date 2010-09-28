@@ -20,7 +20,7 @@ do
     do
           if [ $i -ne $j ]
           then
-          java -Xmx1000M -cp bin:bin/seven/g2/log4j-1.2.15.jar seven.ui.GameEngine "${players[$i]} ${players[$j]}" $h 1 8C2-2player_tourney.txt
+          java -Xmx1000M -cp bin:bin/seven/g2/log4j-1.2.15.jar seven.ui.GameEngine "${players[$i]} ${players[$j]}" $h 100 8C2-2player_tourney.txt
           n=$(($n+$k))
           fi
 done
