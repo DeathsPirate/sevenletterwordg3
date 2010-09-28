@@ -49,6 +49,7 @@ public class History {
 			ArrayList<PlayerBids> cachedBids, int ourID) {
 		// strategy
 		double strength = bidStrategy * H;
+		l.warn("strength is: " + strength);
 
 		double bid = 0;
 		int bidLetterIndex = bidLetter.getAlphabet() - 'A';
@@ -100,6 +101,7 @@ public class History {
 		}
 
 		int indexa = (int) (Math.round(strength * allBids.size()));
+		l.warn("index a is: " + indexa);
 		if (indexa == allBids.size())
 			indexa--;
 		Collections.sort(allBids);
