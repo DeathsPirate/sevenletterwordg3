@@ -24,7 +24,7 @@ public class History {
 	private int[] lettersUsed;
 	private int numberOfPlayers = 0, numHidden = 0, numBidRoundsPlayed,
 			totalLettersInBag = 98;
-	private final double H = 0.8;
+	private final double H = 0.80;
 	private final double lStrategy = 1.000 * 10 / 26;
 	int np = 0;
 
@@ -94,7 +94,7 @@ public class History {
 		} else {
 			indexm = (int) (Math.round(strength
 					* marketValue[bidLetterIndex].size()));
-			if (indexm == marketValue[bidLetterIndex].size())
+			if (indexm >= marketValue[bidLetterIndex].size())
 				indexm--;
 			Collections.sort(marketValue[bidLetterIndex]);
 			bidPortionFromMarketValue = (1 - overallAffect)
