@@ -94,6 +94,10 @@ public class OurPlayer implements Player {
 
 		// Generate Bids
 		double bidStrategy;
+		boolean becomesSeven = becomesSevenLetter(bidLetter.getAlphabet());
+		boolean becomesSix = almostBecomesSevenLetter(bidLetter.getAlphabet());
+		boolean haveSeven = haveSevenLetterWord();
+
 		if (cachedBids.size() == 0 && currentRack.size() == 0)// First round and
 			// no hidden
 			// letters
@@ -105,43 +109,36 @@ public class OurPlayer implements Player {
 		else
 			bidStrategy = defaultBid(bidLetter);
 
-		// Adjusted Bid
-		int adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids, ourID);
+		int adjustedBid = 0;
+		if (becomesSeven == true)
+			adjustedBid = 1000; // arbitrarily high to get ajusted
+		else
+			adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids, ourID);
 
 		// Reduce if it is too high
-		int maxbid = 49;
-		boolean becomesSeven = becomesSevenLetter(bidLetter.getAlphabet());
-		boolean becomesSix = almostBecomesSevenLetter(bidLetter.getAlphabet());
-		boolean haveSeven = haveSevenLetterWord();
-		if (becomesSeven == false) {
-			l.warn("already bid: " + h.getAmountBidOnRound());
-			if (currentRack.size() - h.getNumHidden() != 0)
-				l.warn("already averaged: " + h.getAmountBidOnRound()
-						/ (currentRack.size() - h.getNumHidden()));
-			int denom = 7;
-			if (denom == currentRack.size())
-				denom += 2;
-			if (maxbid <= h.getAmountBidOnRound())
-				maxbid += Math.abs(maxbid - h.getAmountBidOnRound()) + 5;
-			l.warn("comp is: " + (maxbid - h.getAmountBidOnRound())
-					/ (denom - currentRack.size()));
-				l.warn("maxbid: " + maxbid);
-			if (adjustedBid > (maxbid - h.getAmountBidOnRound())
-					/ (denom - currentRack.size())) {
-				adjustedBid = (maxbid - h.getAmountBidOnRound())
-						/ (denom - currentRack.size());
-			}
-		} else if (haveSeven == false && becomesSeven == true) {
-			l.warn("makes a 7 letter word?");
-			adjustedBid *= 1.5;
-		} else if (haveSeven == false && becomesSix == true) {
+		if (haveSeven == false && becomesSix == true) {
 			l.warn("1 away from 7");
-			adjustedBid *= 1.3;
-		} else {
-			l.warn("Should be a low bid, we have seven letters");
+			adjustedBid *= 1.5;
+		}
+		int maxbid = 49;
+		l.warn("already bid: " + h.getAmountBidOnRound());
+		if (currentRack.size() - h.getNumHidden() != 0)
+			l.warn("already averaged: " + h.getAmountBidOnRound()
+					/ (currentRack.size() - h.getNumHidden()));
+		int denom = 7;
+		if (denom == currentRack.size())
+			denom += 2;
+		if (maxbid <= h.getAmountBidOnRound())
+			maxbid += Math.abs(maxbid - h.getAmountBidOnRound()) + 5;
+		l.warn("comp is: " + (maxbid - h.getAmountBidOnRound())
+				/ (denom - currentRack.size()));
+		l.warn("maxbid: " + maxbid);
+		if (adjustedBid > (maxbid - h.getAmountBidOnRound())
+				/ (denom - currentRack.size())) {
+			adjustedBid = (maxbid - h.getAmountBidOnRound())
+					/ (denom - currentRack.size());
 		}
 
-		l.warn("\n\n");
 		return adjustedBid;
 	}
 
@@ -177,7 +174,7 @@ public class OurPlayer implements Player {
 		String r = "";
 		for (int i = 0; i < sortedAmounts.length; i++)
 			r += sortedAmounts[i] + " ";
-		
+
 		if (b == 0)
 			return 0;
 
@@ -191,11 +188,11 @@ public class OurPlayer implements Player {
 
 		double indexb = firstNonZero;
 		for (; indexb < sortedAmounts.length; indexb++)
-			if (sortedAmounts[(int)indexb] == b)
+			if (sortedAmounts[(int) indexb] == b)
 				break;
 
 		l.warn("b is: " + b);
-		l.warn("max is: " + sortedAmounts[(sortedAmounts.length-1)]);
+		l.warn("max is: " + sortedAmounts[(sortedAmounts.length - 1)]);
 		l.warn("index b is: " + indexb + ", firstnonzero: " + firstNonZero);
 		double bidValue = (1 + indexb - firstNonZero)
 				/ (sortedAmounts.length - firstNonZero);
@@ -448,9 +445,10 @@ public class OurPlayer implements Player {
 		for (int i = 0; i < tempcombos.size(); i++) {
 			if (tempcombos.get(i).length() == 7) {
 				int ret = useApriori(tempcombos.get(i).toCharArray());
-				if (ret >= 1){
+				if (ret >= 1) {
 					System.err.println("can make: " + tempcombos.get(i));
-					return true;}
+					return true;
+				}
 			}
 		}
 		return false;
@@ -464,7 +462,7 @@ public class OurPlayer implements Player {
 
 		// copy rack
 		for (char n = 'A'; n <= 'Z'; n++) {
-			
+
 			Rack dummyRack = new Rack();
 			for (int i = 0; i < currentRack.size(); i++)
 				dummyRack.add(currentRack.get(i));

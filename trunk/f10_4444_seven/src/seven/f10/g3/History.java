@@ -47,6 +47,7 @@ public class History {
 
 	public int adjust(double bidStrategy, Letter bidLetter,
 			ArrayList<PlayerBids> cachedBids, int ourID) {
+		
 		// strategy
 		double strength = bidStrategy * H;
 		l.warn("strength is: " + strength);
@@ -82,7 +83,7 @@ public class History {
 
 		// update bidTimes
 		lettersUsed[lastLetterIndex]++;
-
+			
 		double overallAffect = .33;
 		int indexm = -1;
 		double bidPortionFromMarketValue = 0;
