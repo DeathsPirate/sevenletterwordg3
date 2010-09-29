@@ -26,9 +26,6 @@ public class OurPlayer implements Player {
 	private History h;
 	private ArrayList<String> combos;
 
-	// For use to keep track of market value of letters
-	private int[] bidSums = new int[26];
-
 	// Letter Frequency Array, as given by Scrabble rules
 	private int[] letterFrequency = { 9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2,
 			6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1 };
@@ -68,10 +65,6 @@ public class OurPlayer implements Player {
 		combos = new ArrayList<String>();
 		h = new History();
 
-		// Instantiate the market value arrays
-		for (int i = 0; i < 26; i++) {
-			bidSums[i] = 0;
-		}
 
 		resetRack();
 	}
@@ -201,27 +194,6 @@ public class OurPlayer implements Player {
 		return bidValue;
 	}
 
-	/**
-	 * A function to quickly get market value as calculated by previous bid
-	 * wins.
-	 */
-	public int marketValue(char Letter) {
-		int letterPlace = Letter - 'A';
-		return bidSums[letterPlace] / h.getBidTimes(letterPlace); // return
-		// winning
-	}
-
-	/**
-	 * A function to be able to print the marketValue of all letters. To be used
-	 * for information tracking.
-	 */
-	public void printMarketValues() {
-		for (int i = 0; i < 26; i++) {
-			char temp = (char) ('A' + i);
-			l.warn("Letter: " + temp + ", Value: " + bidSums[i]
-					/ h.getBidTimes(i));
-		}
-	}
 
 	public int numberOfPossibilities(char[] arr) {
 		int count = 0;
