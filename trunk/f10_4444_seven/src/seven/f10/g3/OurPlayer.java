@@ -109,10 +109,6 @@ public class OurPlayer implements Player {
 			adjustedBid = h.adjust(bidStrategy, bidLetter, cachedBids, ourID);
 
 		// Reduce if it is too high
-		if (haveSeven == false && becomesSix == true) {
-			l.warn("1 away from 7");
-			adjustedBid *= 1.5;
-		}
 		int maxbid = 49;
 		l.warn("already bid: " + h.getAmountBidOnRound());
 		if (currentRack.size() - h.getNumHidden() != 0)
@@ -130,6 +126,11 @@ public class OurPlayer implements Player {
 				/ (denom - currentRack.size())) {
 			adjustedBid = (maxbid - h.getAmountBidOnRound())
 					/ (denom - currentRack.size());
+		}
+		
+		if (haveSeven == false && becomesSix == true) {
+			l.warn("1 away from 7");
+			adjustedBid *= 1.5;
 		}
 
 		return adjustedBid;
